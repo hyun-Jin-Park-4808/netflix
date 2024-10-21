@@ -4,8 +4,9 @@ export interface Movie {
   id: number;
   title: string;
 }
+
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다. 
-export class AppService {
+export class MovieService {
   private movies: Movie[] = [
     {
       id: 1, 
