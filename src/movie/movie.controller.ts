@@ -14,24 +14,24 @@ export class MovieController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  getMovie(@Param('id') id: string) {
     return this.movieService.getMovieById(+id);
   }
 
   @Post()
-  create(@Body('title') title: string) {
+  postMovie(@Body('title') title: string) {
     return this.movieService.createMovie(title);
   }
 
   @Patch(':id')
-  update(
+  patchMovie(
     @Param('id') id: string, 
     @Body('title') title: string) {
     return this.movieService.updateMovie(+id, title);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  deleteMovie(@Param('id') id: string) {
     return this.movieService.deleteMovie(+id);
   }
 }
