@@ -5,20 +5,21 @@ import { Movie } from './entity/movie.entity';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다. 
 export class MovieService {
-  private movies: Movie[] = [
-    {
-      id: 1, 
-      title: '해리포터',
-      genre: 'fantasy',
-    },
-    {
-      id: 2, 
-      title: '반지의 제왕',
-      genre: 'action',
-    }
-  ];
+  private movies: Movie[] = [];
 
   private idCounter = 3;
+
+  constructor() {
+    const movie1 = new Movie();
+    movie1.id = 1;
+    movie1.title = '해리포터';
+    movie1.genre = 'fantasy';
+
+    const movie2 = new Movie();
+    movie2.id = 2;
+    movie2.title = '반지의 제왕';
+    movie2.genre = 'action';
+  }
 
   getManyMovies(title?: string) {
     if(!title) {
@@ -39,6 +40,7 @@ export class MovieService {
     const movie: Movie = {
       id: this.idCounter++,
       ...createMovieDto,
+      description: 'test'
     };
     this.movies.push(
       movie,

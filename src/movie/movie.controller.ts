@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Controller('movie')
+@UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
   // 사용하고 싶은 의존성을 정의만 해주면 nestJS에서 알아서 의존성 주입을 해준다. 
