@@ -1,5 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MovieService } from './movie.service';
+import { createMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 
 @Controller('movie')
 export class MovieController {
@@ -19,15 +21,18 @@ export class MovieController {
   }
 
   @Post()
-  postMovie(@Body('title') title: string) {
-    return this.movieService.createMovie(title);
+  postMovie(
+    @Body() body: createMovieDto,
+  ) {
+    return this.movieService.createMovie(body);
   }
 
   @Patch(':id')
   patchMovie(
     @Param('id') id: string, 
-    @Body('title') title: string) {
-    return this.movieService.updateMovie(+id, title);
+    @Body() body: UpdateMovieDto,
+  ) {
+    return this.movieService.updateMovie(+id, body);
   }
 
   @Delete(':id')
