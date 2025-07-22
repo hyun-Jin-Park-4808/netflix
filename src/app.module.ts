@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { MovieModule } from './movie/movie.module';
+import { Movie } from './movie/entity/movie.entity';
 
 @Module({
   imports: [
@@ -27,7 +28,7 @@ import { MovieModule } from './movie/movie.module';
         username: configService.get<string>('DB_USERNAME'),
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
-        entities: [],
+        entities: [Movie],
         synchronize: true, // 실서버에서는 false로 해야 한다.
       }),
       inject: [ConfigService], // IoC 컨테이너에서 ConfigService를 DI 해줘야한다고 알려주기 위함

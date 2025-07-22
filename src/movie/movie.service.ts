@@ -3,7 +3,7 @@ import { createMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 
-@Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다. 
+@Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
   private movies: Movie[] = [];
 
@@ -22,15 +22,15 @@ export class MovieService {
   }
 
   getManyMovies(title?: string) {
-    if(!title) {
+    if (!title) {
       return this.movies;
     }
-    return this.movies.filter(m => m.title.startsWith(title));
+    return this.movies.filter((m) => m.title.startsWith(title));
   }
 
   getMovieById(id: number) {
     const movie = this.movies.find((m) => m.id === +id);
-    if(!movie) {
+    if (!movie) {
       throw new NotFoundException('존재하지 않는 영화입니다.');
     }
     return movie;
@@ -40,18 +40,19 @@ export class MovieService {
     const movie: Movie = {
       id: this.idCounter++,
       ...createMovieDto,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      version: 0,
     };
-    this.movies.push(
-      movie,
-    );
+    this.movies.push(movie);
 
     return movie;
   }
 
   updateMovie(id: number, updateMovieDto: UpdateMovieDto) {
-    const movie = this.movies.find(m => m.id === +id);
+    const movie = this.movies.find((m) => m.id === +id);
 
-    if(!movie) {
+    if (!movie) {
       throw new NotFoundException('존재하지 않는 ID의 영화입니다');
     }
     Object.assign(movie, updateMovieDto);
@@ -60,9 +61,9 @@ export class MovieService {
   }
 
   deleteMovie(id: number) {
-    const movieIndex = this.movies.findIndex(m => m.id === +id);
+    const movieIndex = this.movies.findIndex((m) => m.id === +id);
 
-    if(movieIndex === -1) {
+    if (movieIndex === -1) {
       throw new NotFoundException('존재하지 않는 ID의 영화입니다');
     }
     this.movies.splice(movieIndex, 1);
