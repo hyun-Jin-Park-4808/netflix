@@ -13,7 +13,7 @@ export class MovieController {
   getMovies(
     @Query('title') title?: string,
   ) {
-    return this.movieService.getManyMovies();
+    return this.movieService.getManyMovies(title);
   }
 
   @Get(':id')

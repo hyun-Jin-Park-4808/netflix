@@ -3,7 +3,7 @@ import { createMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { Movie } from './entity/movie.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
@@ -12,13 +12,15 @@ export class MovieService {
     private readonly movieRepository: Repository<Movie>
   ) {}
 
-  getManyMovies(title?: string) {
-    // TODO: 나중에 타이틀 필터 기능 추가하기
-    return this.movieRepository.find();
-    // if (!title) {
-    //   return this.movies;
-    // }
-    // return this.movies.filter((m) => m.title.startsWith(title));
+  async getManyMovies(title?: string) {
+    if (!title) {
+      return [await this.movieRepository.find(), await this.movieRepository.count()];
+    }
+    return this.movieRepository.findAndCount({
+      where: {
+        title: Like(`%${title}%`),
+      },
+    })
   }
 
   async getMovieById(id: number) {
