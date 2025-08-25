@@ -7,6 +7,16 @@ import {
   VersionColumn,
 } from 'typeorm';
 
+export class BaseEntity {
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
+
+  @VersionColumn()
+  version: number;
+}
 @Entity()
 export class Movie {
   @PrimaryGeneratedColumn()
@@ -18,12 +28,8 @@ export class Movie {
   @Column()
   genre: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @VersionColumn()
-  version: number;
+  @Column(
+    () => BaseEntity
+  )
+  base: BaseEntity;
 }
