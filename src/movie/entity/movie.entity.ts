@@ -18,7 +18,7 @@ export class BaseEntity {
   version: number;
 }
 @Entity()
-export class Movie {
+export class Movie extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,9 +27,4 @@ export class Movie {
 
   @Column()
   genre: string;
-
-  @Column(
-    () => BaseEntity
-  )
-  base: BaseEntity;
 }
