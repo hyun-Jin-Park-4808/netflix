@@ -4,6 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { MovieModule } from './movie/movie.module';
 import { Movie } from './movie/entity/movie.entity';
+import { MovieDetail } from './movie/entity/movie-detail.entity';
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { Movie } from './movie/entity/movie.entity';
         password: configService.get<string>('DB_PASSWORD'),
         database: configService.get<string>('DB_DATABASE'),
         entities: [
-          Movie,
+          Movie, MovieDetail,
         ],
         synchronize: true, // 실서버에서는 false로 해야 한다.
       }),
