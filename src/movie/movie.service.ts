@@ -17,18 +17,22 @@ export class MovieService {
 
   async getManyMovies(title?: string) {
     if (!title) {
-      return [await this.movieRepository.find(), await this.movieRepository.count()];
+      return [
+        await this.movieRepository.find(),
+        await this.movieRepository.count(),
+      ];
     }
     return this.movieRepository.findAndCount({
       where: {
         title: Like(`%${title}%`),
       },
-    })
+    });
   }
 
   async getMovieById(id: number) {
     const movie = this.movieRepository.findOne({
       where: { id },
+      relations: ['detail'],
     });
 
     if (!movie) {
@@ -42,9 +46,9 @@ export class MovieService {
       detail: createMovieDto.detail,
     });
     const movie = await this.movieRepository.save({
-     title: createMovieDto.title,
-     genre: createMovieDto.genre,
-     detail: movieDetail,
+      title: createMovieDto.title,
+      genre: createMovieDto.genre,
+      detail: movieDetail,
     });
     return movie;
   }
@@ -56,7 +60,7 @@ export class MovieService {
     if (!movie) {
       throw new NotFoundException('존재하지 않는 ID의 영화입니다');
     }
-    await this.movieRepository.update({id}, updateMovieDto); // 얘는 다른  where 조건 추가 가능 
+    await this.movieRepository.update({ id }, updateMovieDto); // 얘는 다른  where 조건 추가 가능
     // await this.movieRepository.update(id, updateMovieDto); 랑 같음
 
     const newMovie = await this.movieRepository.findOne({

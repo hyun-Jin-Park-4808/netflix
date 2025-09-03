@@ -3,7 +3,7 @@ import {
   Entity,
   JoinColumn,
   OneToOne,
-  PrimaryGeneratedColumn
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { BaseTable } from './base-table.entity';
 import { MovieDetail } from './movie-detail.entity';
@@ -22,9 +22,7 @@ export class Movie extends BaseTable {
   @Column()
   genre: string;
 
-  @OneToOne(
-    () => MovieDetail
-  )
-  @JoinColumn() // movie 테이블에 detailId 생김 
+  @OneToOne(() => MovieDetail)
+  @JoinColumn() // movie 테이블에 detailId 생김
   detail: MovieDetail;
 }
