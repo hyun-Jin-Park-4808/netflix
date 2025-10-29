@@ -15,22 +15,22 @@ export class MovieService {
     private readonly movieDetailRepository: Repository<MovieDetail>,
   ) {}
 
-  async getManyMovies(title?: string) {
+  async findAll(title?: string) {
     if (!title) {
       return [
         await this.movieRepository.find(),
         await this.movieRepository.count(),
       ];
     }
-    return this.movieRepository.findAndCount({
+    return await this.movieRepository.findAndCount({
       where: {
         title: Like(`%${title}%`),
       },
     });
   }
 
-  async getMovieById(id: number) {
-    const movie = this.movieRepository.findOne({
+  async findOne(id: number) {
+    const movie = await this.movieRepository.findOne({
       where: { id },
       relations: ['detail'],
     });
@@ -41,7 +41,7 @@ export class MovieService {
     return movie;
   }
 
-  async createMovie(createMovieDto: createMovieDto) {
+  async create(createMovieDto: createMovieDto) {
     const movie = await this.movieRepository.save({
       title: createMovieDto.title,
       genre: createMovieDto.genre,
@@ -52,7 +52,7 @@ export class MovieService {
     return movie;
   }
 
-  async updateMovie(id: number, updateMovieDto: UpdateMovieDto) {
+  async update(id: number, updateMovieDto: UpdateMovieDto) {
     const movie = await this.movieRepository.findOne({
       where: { id },
       relations: ['detail'],
@@ -81,7 +81,7 @@ export class MovieService {
     return newMovie;
   }
 
-  async deleteMovie(id: number) {
+  async remove(id: number) {
     const movie = await this.movieRepository.findOne({
       where: { id },
       relations: ['detail'],
