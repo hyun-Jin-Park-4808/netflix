@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
+import { Genre } from 'src/genre/entities/genre.entity';
 
 export class UpdateMovieDto {
   @IsNotEmpty() // title key 값을 입력하면 value 값이 비면 안 된다.
@@ -7,9 +8,13 @@ export class UpdateMovieDto {
 
   @IsNotEmpty()
   @IsOptional()
-  genre?: string;
+  genres?: Genre[];
 
   @IsNotEmpty()
   @IsOptional()
   detail?: string;
+
+  @IsNotEmpty()
+  @IsOptional()
+  directorId?: number;
 }

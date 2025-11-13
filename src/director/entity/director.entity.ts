@@ -16,6 +16,6 @@ export class Director extends BaseTable {
   @Column()
   nationality: string;
 
-  @OneToMany(() => Movie, (movie) => movie.director) // Movie 엔티티에 director 라는 속송과 매핑
+  @OneToMany(() => Movie, (movie) => movie.director) // Movie 엔티티에 director 라는 속성과 매핑
   movies: Movie[];
 }
