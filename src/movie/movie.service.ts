@@ -252,7 +252,7 @@ export class MovieService {
     } finally {
       await qr.release();
     }
-  }
+  } 
 
   async remove(id: number) {
     const movie = await this.movieRepository.findOne({
