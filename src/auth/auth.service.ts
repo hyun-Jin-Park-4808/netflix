@@ -1,10 +1,15 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Role, User } from 'src/user/entities/user.entity';
-import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
+import { envVarableKeys } from 'src/common/const/env.const';
+import { Role, User } from 'src/user/entities/user.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -60,22 +65,28 @@ export class AuthService {
       throw new BadRequestException('토큰 포맷이 잘못되었습니다.');
     }
 
-    // verifyAsync(): token을 디코딩해 payload를 가져옴과 동시에 원하는 secret으로 인코딩됐는지 검증한다.
-    const payload = await this.jwtService.verifyAsync(token, {
-      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
-    });
+    try {
+      // verifyAsync(): token을 디코딩해 payload를 가져옴과 동시에 원하는 secret으로 인코딩됐는지 검증한다.
+      const payload = await this.jwtService.verifyAsync(token, {
+        secret: this.configService.get<string>(
+          envVarableKeys.accessTokenSecret,
+        ),
+      });
 
-    if (isRefreshToken) {
-      if (payload.type !== 'refresh') {
-        throw new BadRequestException('Refresh Token을 입력해주세요.');
+      if (isRefreshToken) {
+        if (payload.type !== 'refresh') {
+          throw new BadRequestException('Refresh Token을 입력해주세요.');
+        }
+      } else {
+        if (payload.type !== 'access') {
+          throw new BadRequestException('Access Token을 입력해주세요.');
+        }
       }
-    } else {
-      if (payload.type !== 'access') {
-        throw new BadRequestException('Access Token을 입력해주세요.');
-      }
+
+      return payload;
+    } catch (error) {
+      throw new UnauthorizedException('토큰이 만료됐습니다.');
     }
-
-    return payload;
   }
   // rawToken => "Basic $token" 형태로 Base64로 인코딩되어 있다. 여기서 token을 추출해야한다.
   async register(rawToken: string) {
@@ -89,7 +100,7 @@ export class AuthService {
     // Round 넣어주면 salt값은 알아서 생성된다.
     const hash = await bcrypt.hash(
       password,
-      this.configService.get<number>('HASH_ROUNDS'),
+      this.configService.get<number>(envVarableKeys.hashRounds),
     );
 
     await this.userRepository.save({ email, password: hash });
@@ -115,10 +126,10 @@ export class AuthService {
 
   async issueToken(user: { id: number; role: Role }, isRefreshToken: boolean) {
     const refreshTokenSecret = this.configService.get<string>(
-      'REFRESH_TOKEN_SECRET',
+      envVarableKeys.refreshTokenSecret,
     );
     const accessTokenSecret = this.configService.get<string>(
-      'ACCESS_TOKEN_SECRET',
+      envVarableKeys.accessTokenSecret,
     );
 
     return await this.jwtService.signAsync(
