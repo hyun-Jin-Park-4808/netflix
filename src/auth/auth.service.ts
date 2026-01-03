@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
+import { Role, User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { ConfigService } from '@nestjs/config';
@@ -24,7 +24,11 @@ export class AuthService {
       throw new BadRequestException('토큰 포맷이 잘못되었습니다.');
     }
 
-    const [_, token] = basicSplit;
+    const [basic, token] = basicSplit;
+
+    if (basic.toLowerCase() !== 'basic') {
+      throw new BadRequestException('토큰 포맷이 잘못되었습니다.');
+    }
 
     // 2) 토큰을 Base64로 디코딩해서 이메일과 비밀번호로 나눈다.
     // Base64로 인코딩된 token을 utf-8로 변환한다.
@@ -43,6 +47,36 @@ export class AuthService {
     return { email, password };
   }
 
+  async parseBearerToeken(rawToken: string, isRefreshToken: boolean) {
+    const basicSplit = rawToken.split(' ');
+
+    if (basicSplit.length !== 2) {
+      throw new BadRequestException('토큰 포맷이 잘못되었습니다.');
+    }
+
+    const [bearer, token] = basicSplit;
+
+    if (bearer.toLowerCase() !== 'bearer') {
+      throw new BadRequestException('토큰 포맷이 잘못되었습니다.');
+    }
+
+    // verifyAsync(): token을 디코딩해 payload를 가져옴과 동시에 원하는 secret으로 인코딩됐는지 검증한다.
+    const payload = await this.jwtService.verifyAsync(token, {
+      secret: this.configService.get<string>('ACCESS_TOKEN_SECRET'),
+    });
+
+    if (isRefreshToken) {
+      if (payload.type !== 'refresh') {
+        throw new BadRequestException('Refresh Token을 입력해주세요.');
+      }
+    } else {
+      if (payload.type !== 'access') {
+        throw new BadRequestException('Access Token을 입력해주세요.');
+      }
+    }
+
+    return payload;
+  }
   // rawToken => "Basic $token" 형태로 Base64로 인코딩되어 있다. 여기서 token을 추출해야한다.
   async register(rawToken: string) {
     const { email, password } = this.parseBasicToken(rawToken);
@@ -79,7 +113,7 @@ export class AuthService {
     return user;
   }
 
-  async issueToken(user: User, isRefreshToken: boolean) {
+  async issueToken(user: { id: number; role: Role }, isRefreshToken: boolean) {
     const refreshTokenSecret = this.configService.get<string>(
       'REFRESH_TOKEN_SECRET',
     );
