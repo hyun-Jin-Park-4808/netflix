@@ -12,11 +12,13 @@ import {
   ParseIntPipe,
   BadRequestException,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieTitleValidationPipe } from './pipe/movie-title-validation.pipe';
+import { AuthGuard } from 'src/auth/guard/auth.guard';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
@@ -25,11 +27,7 @@ export class MovieController {
   // 사용하고 싶은 의존성을 정의만 해주면 nestJS에서 알아서 의존성 주입을 해준다.
 
   @Get()
-  getMovies(
-    @Request() req: any,
-    @Query('title', MovieTitleValidationPipe) title?: string,
-  ) {
-    console.log(req.user);
+  getMovies(@Query('title', MovieTitleValidationPipe) title?: string) {
     return this.movieService.findAll(title);
   }
 
@@ -50,6 +48,7 @@ export class MovieController {
   }
 
   @Post()
+  @UseGuards(AuthGuard)
   postMovie(@Body() body: createMovieDto) {
     return this.movieService.create(body);
   }
