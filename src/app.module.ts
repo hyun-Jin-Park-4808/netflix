@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { MovieModule } from './movie/movie.module';
-import { Movie } from './movie/entity/movie.entity';
-import { MovieDetail } from './movie/entity/movie-detail.entity';
+import { Movie } from './movie/entities/movie.entity';
+import { MovieDetail } from './movie/entities/movie-detail.entity';
 import { DirectorModule } from './director/director.module';
 import { Director } from './director/entity/director.entity';
 import { GenreModule } from './genre/genre.module';
@@ -15,6 +15,7 @@ import { User } from './user/entities/user.entity';
 import { envVarableKeys } from './common/const/env.const';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
+import { RBACGuard } from './auth/guard/rbac.guard';
 
 @Module({
   imports: [
@@ -57,6 +58,10 @@ import { AuthGuard } from './auth/guard/auth.guard';
     {
       provide: APP_GUARD,
       useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RBACGuard,
     },
   ],
 })

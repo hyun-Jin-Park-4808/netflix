@@ -5,8 +5,8 @@ import { Genre } from 'src/genre/entities/genre.entity';
 import { DataSource, In, Repository } from 'typeorm';
 import { createMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { MovieDetail } from './entity/movie-detail.entity';
-import { Movie } from './entity/movie.entity';
+import { MovieDetail } from './entities/movie-detail.entity';
+import { Movie } from './entities/movie.entity';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
@@ -199,9 +199,9 @@ export class MovieService {
 
       await qr.manager
         .createQueryBuilder()
-        .update()
+        .update(Movie)
         .set(movieUpdateFields)
-        .where('movie.id = :id', { id })
+        .where('id = :id', { id })
         .execute();
 
       // await this.movieRepository.update({ id }, movieUpdateFields); // 얘는 다른  where 조건 추가 가능
@@ -209,9 +209,9 @@ export class MovieService {
       if (detail) {
         await qr.manager
           .createQueryBuilder()
-          .update()
+          .update(MovieDetail)
           .set({ detail })
-          .where('movie.detail.id = :id', { id: movie.detail.id })
+          .where('id = :id', { id: movie.detail.id })
           .execute();
         // await this.movieDetailRepository.update(
         //   {
@@ -252,7 +252,7 @@ export class MovieService {
     } finally {
       await qr.release();
     }
-  } 
+  }
 
   async remove(id: number) {
     const movie = await this.movieRepository.findOne({

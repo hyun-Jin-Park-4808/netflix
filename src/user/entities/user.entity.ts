@@ -3,9 +3,9 @@ import { BaseTable } from 'src/common/entity/base-table.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
-  admin,
-  paidUser,
-  user,
+  admin, // admin에 대한 값은 0이 매핑된다.
+  paidUser, // 1
+  user, // 2
 }
 
 @Entity()

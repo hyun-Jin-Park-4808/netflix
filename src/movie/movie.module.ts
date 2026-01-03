@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Movie } from './entity/movie.entity';
+import { Movie } from './entities/movie.entity';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
-import { MovieDetail } from './entity/movie-detail.entity';
+import { MovieDetail } from './entities/movie-detail.entity';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entities/genre.entity';
 
