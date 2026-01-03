@@ -52,6 +52,7 @@ export class AuthService {
     return { email, password };
   }
 
+  // 미들웨어로 옮긴 코드
   async parseBearerToeken(rawToken: string, isRefreshToken: boolean) {
     const basicSplit = rawToken.split(' ');
 
@@ -69,7 +70,9 @@ export class AuthService {
       // verifyAsync(): token을 디코딩해 payload를 가져옴과 동시에 원하는 secret으로 인코딩됐는지 검증한다.
       const payload = await this.jwtService.verifyAsync(token, {
         secret: this.configService.get<string>(
-          envVarableKeys.accessTokenSecret,
+          isRefreshToken
+            ? envVarableKeys.refreshTokenSecret
+            : envVarableKeys.accessTokenSecret,
         ),
       });
 
@@ -88,6 +91,7 @@ export class AuthService {
       throw new UnauthorizedException('토큰이 만료됐습니다.');
     }
   }
+
   // rawToken => "Basic $token" 형태로 Base64로 인코딩되어 있다. 여기서 token을 추출해야한다.
   async register(rawToken: string) {
     const { email, password } = this.parseBasicToken(rawToken);

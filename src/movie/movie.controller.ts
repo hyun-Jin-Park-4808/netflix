@@ -11,6 +11,7 @@ import {
   ClassSerializerInterceptor,
   ParseIntPipe,
   BadRequestException,
+  Request,
 } from '@nestjs/common';
 import { MovieService } from './movie.service';
 import { createMovieDto } from './dto/create-movie.dto';
@@ -24,7 +25,11 @@ export class MovieController {
   // 사용하고 싶은 의존성을 정의만 해주면 nestJS에서 알아서 의존성 주입을 해준다.
 
   @Get()
-  getMovies(@Query('title', MovieTitleValidationPipe) title?: string) {
+  getMovies(
+    @Request() req: any,
+    @Query('title', MovieTitleValidationPipe) title?: string,
+  ) {
+    console.log(req.user);
     return this.movieService.findAll(title);
   }
 
