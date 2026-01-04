@@ -1,13 +1,18 @@
-import { IsIn, IsInt, IsOptional } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class CursorPaginationDto {
-  @IsInt()
+  @IsString()
   @IsOptional()
-  id?: number;
+  // id_52, likeCount_20
+  cursor?: string;
 
-  @IsIn(['ASC', 'DESC'])
+  @IsArray()
+  @IsString({
+    each: true,
+  })
   @IsOptional()
-  order: 'ASC' | 'DESC' = 'DESC';
+  // id_ASC, id_DESC
+  order: string[] = ['id_DESC']; // 쿼리에 넣어줄 때는 키 값을 ?order[]=likeCount_DESC&order[]=id_DESC 와 같이 전달해야한다.
 
   @IsInt()
   @IsOptional()

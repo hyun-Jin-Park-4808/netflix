@@ -38,9 +38,12 @@ export class MovieService {
     }
     // this.commonService.applyPagePaginationParamsToQb(qb, dto);
 
-    this.commonService.applyCursorPaginationParamsToQb(qb, dto);
+    const { nextCursor } =
+      await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
-    return await qb.getManyAndCount();
+    const [data, count] = await qb.getManyAndCount(); // qb에 applyCursorPaginationParamsToQb()를 통해 페이지네이션 적용된다.
+
+    return { data, nextCursor, count };
     // if (!title) {
     //   return [
     //     await this.movieRepository.find({
