@@ -66,7 +66,17 @@ export class MovieController {
       name: 'poster',
       maxCount: 2,
     }
-  ]))
+  ], {
+    limits: {
+      fileSize: 20000000, // 20MB
+    },
+    fileFilter(req, file, cb) {
+      if(file.mimetype !== 'video/mp4') {
+        return cb(new BadRequestException('mp4 타입만 입력해주세요.'),  false);
+      }
+      return cb(null, true); // null 부분에 에러 넣어주면 에러 던지게 된다. true 로 설정하면 파일을 받아볼 수 있고 false로 설정하면 파일 안받는다.
+    },
+  }))
   // @UseInterceptors(FilesInterceptor('movies')) // 단수일 경우 FileInterceptor
   postMovie(
     @Body() body: createMovieDto,
