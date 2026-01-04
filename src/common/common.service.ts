@@ -1,8 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { SelectQueryBuilder } from 'typeorm';
-import { PagePaginationDto } from './dto/page-pagination.dto';
 import { CursorPaginationDto } from './dto/cursor-pagination.dto';
-import { Director } from 'src/director/entity/director.entity';
+import { PagePaginationDto } from './dto/page-pagination.dto';
 
 @Injectable()
 export class CommonService {
@@ -29,7 +28,7 @@ export class CommonService {
     if (cursor) {
       const decodedCursor = Buffer.from(cursor, 'base64').toString('utf-8');
       /**
-       *  cursorObj 구조F
+       *  cursorObj 구조
        * {
        * values: {
        *   id: 52
@@ -42,7 +41,7 @@ export class CommonService {
       order = cursorObj.order;
       const { values } = cursorObj;
 
-      // {movice.column1, movice.column2, movice.column3} > {:value1, :value2, :value3}
+      // (movice.column1, movice.column2, movice.column3) > (:value1, :value2, :value3)
       const columns = Object.keys(values);
       const comparisonOperator = order.some((o) => o.endsWith('DESC'))
         ? '<'
