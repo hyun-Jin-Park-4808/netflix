@@ -7,9 +7,9 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
-import { createMovieDto } from './create-movie.dto';
+import { CreateMovieDto } from './create-movie.dto';
 
-export class UpdateMovieDto extends PartialType(createMovieDto) {}
+export class UpdateMovieDto extends PartialType(CreateMovieDto) {}
 
 // export class UpdateMovieDto {
 //   @IsNotEmpty() // title key 값을 입력하면 value 값이 비면 안 된다.

@@ -19,6 +19,8 @@ import { RBACGuard } from './auth/guard/rbac.guard';
 import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
 import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -50,6 +52,10 @@ import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
         synchronize: true, // 실서버에서는 false로 해야 한다.
       }),
       inject: [ConfigService], // IoC 컨테이너에서 ConfigService를 DI 해줘야한다고 알려주기 위함
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'public'), // 실제 서버 파일 시스템 경로, public 폴더 안의 파일들을 정적으로 제공하겠다.
+      serveRoot: '/public/', // 브라우저에서 정적 파일에 접근할 url prefix
     }),
     MovieModule,
     DirectorModule,
