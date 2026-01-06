@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Movie } from './entities/movie.entity';
+import { Movie } from './entity/movie.entity';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
-import { MovieDetail } from './entities/movie-detail.entity';
+import { MovieDetail } from './entity/movie-detail.entity';
 import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entities/genre.entity';
+import { Genre } from 'src/genre/entity/genre.entity';
 import { CommonModule } from 'src/common/common.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';

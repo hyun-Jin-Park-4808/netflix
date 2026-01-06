@@ -1,5 +1,5 @@
 import { BaseTable } from 'src/common/entity/base-table.entity';
-import { Movie } from 'src/movie/entities/movie.entity';
+import { Movie } from 'src/movie/entity/movie.entity';
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()

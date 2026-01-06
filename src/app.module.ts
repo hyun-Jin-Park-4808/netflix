@@ -3,15 +3,15 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import { MovieModule } from './movie/movie.module';
-import { Movie } from './movie/entities/movie.entity';
-import { MovieDetail } from './movie/entities/movie-detail.entity';
+import { Movie } from './movie/entity/movie.entity';
+import { MovieDetail } from './movie/entity/movie-detail.entity';
 import { DirectorModule } from './director/director.module';
 import { Director } from './director/entity/director.entity';
 import { GenreModule } from './genre/genre.module';
-import { Genre } from './genre/entities/genre.entity';
+import { Genre } from './genre/entity/genre.entity';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
-import { User } from './user/entities/user.entity';
+import { User } from './user/entity/user.entity';
 import { envVarableKeys } from './common/const/env.const';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
@@ -21,6 +21,7 @@ import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
 import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { MovieUserLike } from './movie/entity/movie-user-like.entity';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { join } from 'path';
         username: configService.get<string>(envVarableKeys.dbUsername),
         password: configService.get<string>(envVarableKeys.dbPassword),
         database: configService.get<string>(envVarableKeys.dbDatabase),
-        entities: [Movie, MovieDetail, Director, Genre, User],
+        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
         synchronize: true, // 실서버에서는 false로 해야 한다.
       }),
       inject: [ConfigService], // IoC 컨테이너에서 ConfigService를 DI 해줘야한다고 알려주기 위함

@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entities/genre.entity';
+import { Genre } from 'src/genre/entity/genre.entity';
 import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
-import { MovieDetail } from './entities/movie-detail.entity';
-import { Movie } from './entities/movie.entity';
+import { MovieDetail } from './entity/movie-detail.entity';
+import { Movie } from './entity/movie.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CommonService } from 'src/common/common.service';
 import { join } from 'path';
