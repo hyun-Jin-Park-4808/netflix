@@ -25,4 +25,8 @@ export class CreateMovieDto {
   @Type(() => Number)
   @IsNumber({}, { each: true }) // each: true :  validation 옵션, 배열 모든 요소가 number 타입이어야 한다.
   genreIds: number[];
+
+  @IsNotEmpty()
+  @IsString()
+  movieFileName: string;
 }

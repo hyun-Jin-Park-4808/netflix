@@ -10,6 +10,7 @@ import { Movie } from './entities/movie.entity';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { CommonService } from 'src/common/common.service';
 import { join } from 'path';
+import { rename } from 'fs/promises';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
@@ -51,6 +52,7 @@ export class MovieService {
       .leftJoinAndSelect('movie.director', 'director')
       .leftJoinAndSelect('movie.genres', 'genres')
       .leftJoinAndSelect('movie.detail', 'detail')
+      .leftJoinAndSelect('movie.creator', 'creator')
       .where('movie.id = :id', { id })
       .getOne();
 
@@ -62,7 +64,7 @@ export class MovieService {
 
   async create(
     createMovieDto: CreateMovieDto,
-    movieFileName: string,
+    userId: number,
     qr: QueryRunner,
   ) {
     const director = await qr.manager.findOne(Director, {
@@ -95,6 +97,7 @@ export class MovieService {
     const movieDetailId = movieDetail.identifiers[0].id;
 
     const movieFoler = join('public', 'movie');
+    const tempFoler = join('public', 'temp');
 
     const movie = await qr.manager
       .createQueryBuilder()
@@ -104,7 +107,8 @@ export class MovieService {
         title: createMovieDto.title,
         detail: { id: movieDetailId }, // queryBuilder로는 다른 테이블에 동시에 데이터 만드는 건 안되고 따로 따로 만들고 연관관계만 넣어줄 수 있음.
         director,
-        movieFilePath: join(movieFoler, movieFileName),
+        creator: { id: userId },
+        movieFilePath: join(movieFoler, createMovieDto.movieFileName),
         genres,
       })
       .execute();
@@ -117,6 +121,12 @@ export class MovieService {
       .relation(Movie, 'genres') // Movie의 genres 필드에 연관관계 추가
       .of(movieId) // Movie중 id = movieId 에 연관관계 추가
       .add(genres.map((genre) => genre.id)); // 장르 id 들을 추가
+
+    await rename(
+      // transaction 범위에 포함되지 않기 때문에 transaction 범위 끝나고 실행하기
+      join(process.cwd(), tempFoler, createMovieDto.movieFileName),
+      join(process.cwd(), movieFoler, createMovieDto.movieFileName),
+    );
 
     return await qr.manager.findOne(Movie, {
       // qr로 가져와야 트랜잭션 인터셉터에서 커밋되기 전에 저장된 데이터를 가져올 수 있다.

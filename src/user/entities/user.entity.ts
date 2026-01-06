@@ -1,6 +1,7 @@
 import { Exclude } from 'class-transformer';
 import { BaseTable } from 'src/common/entity/base-table.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Movie } from 'src/movie/entities/movie.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 export enum Role {
   admin, // admin에 대한 값은 0이 매핑된다.
@@ -30,4 +31,7 @@ export class User extends BaseTable {
     default: Role.user,
   })
   role: Role;
+
+  @OneToMany(() => Movie, (movie) => movie.creator)
+  createMovies: Movie[];
 }
