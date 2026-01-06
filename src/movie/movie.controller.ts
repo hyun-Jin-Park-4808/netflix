@@ -11,23 +11,20 @@ import {
   Post,
   Query,
   Request,
-  UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
+import { UserId } from 'src/user/decorator/user-id.decorator';
 import { Role } from 'src/user/entities/user.entity';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { MovieFilePipe } from './pipe/movie-file.pipe';
-import { UserId } from 'src/user/decorator/user-id.decorator';
+import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
+import { QueryRunner as QR } from 'typeorm';
+import { query } from 'express';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
@@ -64,9 +61,10 @@ export class MovieController {
   postMovie(
     @Request() req: any,
     @Body() body: CreateMovieDto,
+    @QueryRunner() queryRunner: QR,
     @UserId() userId: number,
   ) {
-    return this.movieService.create(body, userId, req.queryRunner);
+    return this.movieService.create(body, userId, queryRunner);
   }
 
   @Patch(':id')
