@@ -1,11 +1,6 @@
-import {
-  Entity,
-  ManyToOne,
-  PrimaryColumn,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
-import { Movie } from './movie.entity';
 import { User } from 'src/user/entity/user.entity';
+import { Column, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Movie } from './movie.entity';
 
 @Entity()
 export class MovieUserLike {
@@ -24,4 +19,7 @@ export class MovieUserLike {
   })
   @ManyToOne(() => User, (user) => user.likedMovies)
   user: User;
+
+  @Column()
+  isLike: boolean;
 }
