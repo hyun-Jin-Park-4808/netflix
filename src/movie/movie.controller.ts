@@ -15,16 +15,15 @@ import {
 } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
+import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { UserId } from 'src/user/decorator/user-id.decorator';
 import { Role } from 'src/user/entity/user.entity';
+import { QueryRunner as QR } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
-import { QueryRunner as QR } from 'typeorm';
-import { query } from 'express';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
@@ -34,8 +33,8 @@ export class MovieController {
 
   @Get()
   @Public()
-  getMovies(@Query() dto: GetMoviesDto) {
-    return this.movieService.findAll(dto);
+  getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
+    return this.movieService.findAll(dto, userId);
   }
 
   @Get(':id')
@@ -84,16 +83,16 @@ export class MovieController {
 
   /**
    * [Like] [Dislike]
-   * 
+   *
    * 아무것도 누르지 않은 상태
    * Like & Dislike 모두 버튼 꺼져있음
-   * 
+   *
    * Like 버튼 누르면 Like 버튼 불 켜짐
    * Like 버튼 다시 누르면 Like 버튼 꺼짐
-   * 
+   *
    * Dislike 버튼 누르면 Dislike 버튼 불켜짐
    * Dislike 버튼 다시 누르면 Dislike 버튼 꺼짐
-   * 
+   *
    * Like버튼 누름 -> Dislike 버튼 불 꺼지고 Like 버튼 불 켜짐
    * Dislike버튼 누름 -> Like 버튼 불 꺼지고 Dislike 버튼 불 켜짐
    */
@@ -101,7 +100,7 @@ export class MovieController {
   createMovieLike(
     @Param('id', ParseIntPipe) id: number,
     @UserId() userId: number,
-  ){
+  ) {
     return this.movieService.toggleMovieLike(id, userId, true);
   }
 
@@ -109,7 +108,7 @@ export class MovieController {
   createMovieDislike(
     @Param('id', ParseIntPipe) id: number,
     @UserId() userId: number,
-  ){
+  ) {
     return this.movieService.toggleMovieLike(id, userId, false);
   }
 }

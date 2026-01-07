@@ -23,5 +23,6 @@ module.exports = {
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     'eslint-disable-next-line prefer-const': 'off',
+    'eslint-disable-next-line prefer-const': 'off',
   },
 };

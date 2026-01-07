@@ -33,7 +33,7 @@ export class MovieService {
     private readonly commonService: CommonService,
   ) {}
 
-  async findAll(dto: GetMoviesDto) {
+  async findAll(dto: GetMoviesDto, userId?: number) {
     const { title } = dto;
 
     const qb = await this.movieRepository
@@ -47,8 +47,43 @@ export class MovieService {
     const { nextCursor } =
       await this.commonService.applyCursorPaginationParamsToQb(qb, dto);
 
-    const [data, count] = await qb.getManyAndCount(); // qb에 applyCursorPaginationParamsToQb()를 통해 페이지네이션 적용된다.
+    let [data, count] = await qb.getManyAndCount(); // qb에 applyCursorPaginationParamsToQb()를 통해 페이지네이션 적용된다.
 
+    if (userId) {
+      const movieIds = data.map((movie) => movie.id);
+
+      // 로그인한 유저가 좋아요한 영화들을 추출한다.
+      const likedMovies =
+        movieIds.length < 1
+          ? []
+          : await this.movieUserLikeRepository
+              .createQueryBuilder('movieUserLike')
+              .leftJoinAndSelect('movieUserLike.movie', 'movie')
+              .leftJoinAndSelect('movieUserLike.user', 'user')
+              .where('movie.id IN (:...movieIds)', { movieIds })
+              .andWhere('user.id = :userId', { userId })
+              .getMany();
+
+      /**
+       * 로그인한 유저가 좋아요한 영화 map 만들기
+       * 아래 구조로 likedMovieMap 만들기
+       * {
+       * movieId: boolean
+       * }
+       */
+      const likedMovieMap = likedMovies.reduce(
+        (acc, next) => ({
+          ...acc,
+          [next.movie.id]: next.isLike, // { movieId: boolean } 형태로 축적됨
+        }),
+        {},
+      );
+
+      data = data.map((x) => ({
+        ...x, // 기존 data 객체에 likeStatus(null || true || false)를 추가해줌
+        likeStatus: x.id in likedMovieMap ? likedMovieMap[x.id] : null,
+      }));
+    }
     return { data, nextCursor, count };
   }
 

@@ -33,10 +33,10 @@ export class CommonController {
     // ) movie: Express.Multer.File, // 이렇게 파이프로 파일 이름 변경할 수 있지만 모듈에서 파일명 변경하는 코드 넣는 것이 훨씬 간단하고,
     // 인터셉터 -> 파이프이기 때문에 인터셉터의 필터링 조건과 파이프의 필터링 조건이 다르면 인터셉터에서 통과해 업로드 되고 나서 파이프에서 에러가 발생할 수도 있다.
     // 인터셉터 전에 적용되는 미들웨어 -> 가드 (-> 인터셉터) 에서 파일 업로드를 막아야한다.
-    @UploadedFile() movie: Express.Multer.File,
+    @UploadedFile() video: Express.Multer.File,
   ) {
     return {
-      fileName: movie.filename,
+      fileName: video.filename,
     };
   }
 }
