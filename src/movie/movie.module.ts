@@ -1,3 +1,4 @@
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'src/common/common.module';
@@ -20,6 +21,9 @@ import { MovieService } from './movie.service';
       User,
     ]),
     CommonModule,
+    CacheModule.register({
+      tt: 3000, // 캐시 유효 시간
+    }),
     // MulterModule.register({
     //   storage: diskStorage({
     //     // diskStorage: 로컬 저장소에 저장하겠다.

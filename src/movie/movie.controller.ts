@@ -37,6 +37,11 @@ export class MovieController {
     return this.movieService.findAll(dto, userId);
   }
 
+  @Get('recent') // :id 위에 선언해야 nestJS해서 라우팅이 제대로 된다. 정적 라우트 -> 동적 라우트 순으로 둬야 한다.
+  getMoviesRecent() {
+    return this.movieService.findRecent();
+  }
+
   @Get(':id')
   @Public()
   getMovie(

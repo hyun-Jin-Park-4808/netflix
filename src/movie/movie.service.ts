@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Director } from 'src/director/entity/director.entity';
 import { Genre } from 'src/genre/entity/genre.entity';
@@ -13,6 +13,7 @@ import { join } from 'path';
 import { rename } from 'fs/promises';
 import { User } from 'src/user/entity/user.entity';
 import { MovieUserLike } from './entity/movie-user-like.entity';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
@@ -31,7 +32,28 @@ export class MovieService {
     private readonly movieUserLikeRepository: Repository<MovieUserLike>,
     private readonly dataSource: DataSource,
     private readonly commonService: CommonService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache, // 메모리에 있기 때문에 재시작하면 리셋된다.
   ) {}
+
+  async findRecent() {
+    const cacheData = await this.cacheManager.get('MOVIE_RECENT');
+
+    if (cacheData) {
+      return cacheData;
+    }
+
+    const data = await this.movieRepository.find({
+      order: {
+        createdAt: 'DESC',
+      },
+      take: 10,
+    });
+
+    // 모듈 단위에 적용한 것보다 서비스단이 더 상위 단이기 때문에 서비스에 적용한 ttl이 오버라이딩된다. 
+    await this.cacheManager.set('MOVIE_RECENT', data, 3000); // ttl: 0으로 설정하면 캐싱된 데이터 계속 가지고 있는다.
+    return data;
+  }
 
   async findAll(dto: GetMoviesDto, userId?: number) {
     const { title } = dto;
