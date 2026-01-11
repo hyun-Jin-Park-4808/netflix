@@ -22,6 +22,7 @@ import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { MovieUserLike } from './movie/entity/movie-user-like.entity';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -57,6 +58,10 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'public'), // 실제 서버 파일 시스템 경로, public 폴더 안의 파일들을 정적으로 제공하겠다.
       serveRoot: '/public/', // 브라우저에서 정적 파일에 접근할 url prefix
+    }),
+    CacheModule.register({
+      ttl: 0, // 캐시 유효 시간
+      isGlobal: true, // 전역 캐시 설정
     }),
     MovieModule,
     DirectorModule,
