@@ -1,4 +1,9 @@
 import {
+  CacheKey,
+  CacheTTL,
+  CacheInterceptor as CI,
+} from '@nestjs/cache-manager';
+import {
   BadRequestException,
   Body,
   ClassSerializerInterceptor,
@@ -16,6 +21,7 @@ import {
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
+import { Throttle } from 'src/common/decorator/throttle.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { UserId } from 'src/user/decorator/user-id.decorator';
 import { Role } from 'src/user/entity/user.entity';
@@ -24,7 +30,6 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manager';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
@@ -34,6 +39,7 @@ export class MovieController {
 
   @Get()
   @Public()
+  @Throttle({ count: 5, unit: 'minute' })
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }
