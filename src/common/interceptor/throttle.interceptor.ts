@@ -35,6 +35,9 @@ export class ThrottleInterceptor implements NestInterceptor {
       count: number;
       unit: 'minute';
     }>(Throttle, context.getHandler());
+    // reflector.get<type>(metadataKey, target)
+    // metadataKey: Throttle => 조회할 메타데이터의 키
+    // => target: context.getHandler() => 현재 요청이 실행 중인 컨트롤러 메서드 반환, 여기서 Throttle 필드를 가져온다.
 
     if (!throttleOptions) {
       return next.handle();

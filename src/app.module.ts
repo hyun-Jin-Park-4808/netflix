@@ -24,6 +24,7 @@ import { join } from 'path';
 import { MovieUserLike } from './movie/entity/movie-user-like.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -64,6 +65,7 @@ import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
       ttl: 0, // 캐시 유효 시간
       isGlobal: true, // 전역 캐시 설정
     }),
+    ScheduleModule.forRoot(),
     MovieModule,
     DirectorModule,
     GenreModule,
