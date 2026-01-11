@@ -1,5 +1,7 @@
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import {
   BadRequestException,
+  Inject,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -18,7 +20,23 @@ export class AuthService {
     private readonly userRepository: Repository<User>,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) {}
+
+  async blockToken(token: string) {
+    const payload = await this.jwtService.decode(token);
+    const expiryDate = +new Date(payload['exp'] * 1000); // 숫자(ms)로 변환하기 위해 +붙임.
+    const now = +new Date();
+    const differenceInSeconds = (expiryDate - now) / 1000; // 초 단위로 변환하기 위해 /1000 적용.
+    await this.cacheManager.set(
+      `BOLOCK_TOKEN_${token}`,
+      payload,
+      Math.max(differenceInSeconds * 1000, 1),
+    );
+
+    return true;
+  }
 
   parseBasicToken(rawToken: string) {
     // 1) 토큰을 ' '기준으로 스플릿한 후 토큰 값 추출하기

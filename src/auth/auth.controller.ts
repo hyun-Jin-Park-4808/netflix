@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Get,
   Headers,
@@ -28,6 +29,11 @@ export class AuthController {
   // authorization: Basic $token
   loginUser(@Headers('authorization') token: string) {
     return this.authService.login(token);
+  }
+
+  @Post('token/block')
+  blockToken(@Body('token') token: string) {
+    return this.authService.blockToken(token);
   }
 
   @UseGuards(LocalAuthGuard) // 아래랑 똑같은 기능, codefactory를 직접 입력하지 않아도 된다.
