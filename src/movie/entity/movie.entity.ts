@@ -42,6 +42,11 @@ export class Movie extends BaseTable {
   })
   likeCount: number;
 
+  @Column({
+    default: 0,
+  })
+  dislikeCount: number;
+
   @OneToOne(() => MovieDetail, (movieDetail) => movieDetail.id, {
     cascade: true, // movie crud 할 때 detail도 같이 crud 해주는 옵션
     nullable: false,
