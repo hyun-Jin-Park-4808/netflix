@@ -24,6 +24,7 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
+import { CacheKey, CacheTTL, CacheInterceptor as CI } from '@nestjs/cache-manager';
 
 @Controller('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
@@ -38,6 +39,9 @@ export class MovieController {
   }
 
   @Get('recent') // :id 위에 선언해야 nestJS해서 라우팅이 제대로 된다. 정적 라우트 -> 동적 라우트 순으로 둬야 한다.
+  @UseInterceptors(CI) // 자동으로 엔드포인트의 결과를 캐싱한다. url을 키로 두고 캐싱하기 때문에 파라미터 추가되면 다른 키로 인식해서 새로 캐싱한다.
+  @CacheKey('getMoviesRecent') // 캐시 키를 지정하게되면 파라미터 변경되도 ttl 동안 같은 캐싱된 값이 리턴된다.
+  @CacheTTL(1000) // 캐싱 ttl 오버라이드 가능하다.
   getMoviesRecent() {
     return this.movieService.findRecent();
   }
