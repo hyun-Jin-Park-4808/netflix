@@ -13,10 +13,11 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('user')
 @ApiBearerAuth()
+@ApiTags('user')
 @UseInterceptors(ClassSerializerInterceptor) // @Exclude 적용
 export class UserController {
   constructor(private readonly userService: UserService) {}

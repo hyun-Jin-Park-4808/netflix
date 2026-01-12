@@ -31,24 +31,14 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { ApiBearerAuth } from '@nestjs/swagger';
-
-// @Controller({
-//   path: 'movie',
-//   version: '2',
-// })
-// export class MovieControllerV2 {
-//   @Get()
-//   getMovies() {
-//     return [];
-//   }
-// }
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @Controller({
   path: 'movie',
   // version: VERSION_NEUTRAL, // 버전 없거나 모든 버전에 대해 적용
 })
 @ApiBearerAuth()
+@ApiTags('movie')
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -58,6 +48,17 @@ export class MovieController {
   @Public()
   @Throttle({ count: 5, unit: 'minute' })
   // @Version(['1', '3', '5']) // 컨트롤러단 버전 정의 오버라이딩됨. 이 api는 버전 1, 3, 5번으로만 호출 가능
+  @ApiOperation({
+    description: '[Movie]를 Pagination하는 API',
+  })
+  @ApiResponse({
+    status: 200,
+    description: '성공 응답',
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'pagination 데이터를 잘못 입력했을 때 응답',
+  })
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }
@@ -145,3 +146,14 @@ export class MovieController {
     return this.movieService.toggleMovieLike(id, userId, false);
   }
 }
+
+// @Controller({
+//   path: 'movie',
+//   version: '2',
+// })
+// export class MovieControllerV2 {
+//   @Get()
+//   getMovies() {
+//     return [];
+//   }
+// }
