@@ -1,12 +1,5 @@
-import { PartialType } from '@nestjs/mapped-types';
-import {
-  ArrayNotEmpty,
-  IsArray,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+
+import { PartialType } from '@nestjs/swagger'; // swagger에서 불러와야 CreateMovieDto swagger 정보를 참조하게 해준다. 
 import { CreateMovieDto } from './create-movie.dto';
 
 export class UpdateMovieDto extends PartialType(CreateMovieDto) {}
