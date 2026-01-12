@@ -12,11 +12,16 @@ async function bootstrap() {
     .setTitle('Netflix API')
     .setDescription('Netflix NestJS 강의')
     .setVersion('1.0')
-    .addTag('movie')
+    .addBasicAuth()
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('doc', app, document);
+  SwaggerModule.setup('doc', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true, // 스웨거 새로고침해도 기억하게 하는 옵션
+    }
+  });
 
   // app.enableVersioning({
   // type: VersioningType.URI,

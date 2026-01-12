@@ -31,6 +31,7 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 // @Controller({
 //   path: 'movie',
@@ -47,6 +48,7 @@ import { MovieService } from './movie.service';
   path: 'movie',
   // version: VERSION_NEUTRAL, // 버전 없거나 모든 버전에 대해 적용
 })
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
