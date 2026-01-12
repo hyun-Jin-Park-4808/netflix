@@ -17,6 +17,7 @@ import {
   Query,
   Request,
   UseInterceptors,
+  Version,
 } from '@nestjs/common';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
@@ -31,7 +32,21 @@ import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
 
-@Controller('movie')
+@Controller({
+  path: 'movie',
+  version: '2',
+})
+export class MovieControllerV2 {
+  @Get()
+  getMovies() {
+    return [];
+  }
+}
+
+@Controller({
+  path: 'movie',
+  version: ['1', '3'],
+})
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
@@ -40,6 +55,7 @@ export class MovieController {
   @Get()
   @Public()
   @Throttle({ count: 5, unit: 'minute' })
+  @Version(['1', '3', '5']) // 컨트롤러단 버전 정의 오버라이딩됨. 이 api는 버전 1, 3, 5번으로만 호출 가능
   getMovies(@Query() dto: GetMoviesDto, @UserId() userId?: number) {
     return this.movieService.findAll(dto, userId);
   }

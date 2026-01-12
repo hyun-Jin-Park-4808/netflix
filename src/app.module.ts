@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
@@ -27,6 +32,7 @@ import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WinstonModule } from 'nest-winston';
 import * as winston from 'winston';
+import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
 
 @Module({
   imports: [
@@ -80,7 +86,8 @@ import * as winston from 'winston';
             winston.format.timestamp(), // 로그 시간 표시
             winston.format.printf(
               // 로그 포맷 지정
-              (info) => `[${info.context}] ${info.level} ${info.message}`,
+              (info) =>
+                `${info.timestamp} [${info.context}] ${info.level} ${info.message}`,
             ),
           ),
         }),
@@ -92,7 +99,8 @@ import * as winston from 'winston';
             // 로그 파일에 저장될 로그 포맷 지정
             winston.format.timestamp(),
             winston.format.printf(
-              (info) => `[${info.context}] ${info.level} ${info.message}`,
+              (info) =>
+                `${info.timestamp} [${info.context}] ${info.level} ${info.message}`,
             ),
           ),
         }),

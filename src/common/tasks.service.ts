@@ -20,7 +20,7 @@ export class TasksService {
     private readonly logger: LoggerService,
   ) {}
 
-  @Cron('*/5 * * * * *')
+  // @Cron('*/5 * * * * *')
   async logEverySeconds() {
     // 순서대로 중요한 로그
     this.logger.fatal('FATAL 레벨 로그', null, TasksService.name); // context 이름을 넣어줌, fatal, error는 두 번째 인자에 message나 stack trace 인자를 받는다.

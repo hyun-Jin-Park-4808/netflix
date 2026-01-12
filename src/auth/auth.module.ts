@@ -27,10 +27,12 @@ export class AuthModule implements NestModule {
         {
           path: 'auth/login',
           method: RequestMethod.POST,
+          // version: ['1', '2'], // v1/auth/login, v2/auth/login은 미들웨어 적용 제외
         },
         {
           path: 'auth/register',
           method: RequestMethod.POST,
+          // version: ['1', '2'],
         },
       )
       .forRoutes('*');
