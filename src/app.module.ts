@@ -25,6 +25,8 @@ import { MovieUserLike } from './movie/entity/movie-user-like.entity';
 import { CacheModule } from '@nestjs/cache-manager';
 import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
 import { ScheduleModule } from '@nestjs/schedule';
+import { WinstonModule } from 'nest-winston';
+import * as winston from 'winston';
 
 @Module({
   imports: [
@@ -66,6 +68,36 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true, // 전역 캐시 설정
     }),
     ScheduleModule.forRoot(),
+    WinstonModule.forRoot({
+      level: 'debug',
+      transports: [
+        new winston.transports.Console({
+          format: winston.format.combine(
+            // 다양한 형태로 콘솔 로그 포맷 지정 가능
+            winston.format.colorize({
+              all: true, // 모든 로그를 색상 지정
+            }),
+            winston.format.timestamp(), // 로그 시간 표시
+            winston.format.printf(
+              // 로그 포맷 지정
+              (info) => `[${info.context}] ${info.level} ${info.message}`,
+            ),
+          ),
+        }),
+        new winston.transports.File({
+          // 로그 파일 저장 설정
+          dirname: join(process.cwd(), 'logs'), // 로그 파일 저장 경로
+          filename: 'logs.log', // 로그 파일 이름
+          format: winston.format.combine(
+            // 로그 파일에 저장될 로그 포맷 지정
+            winston.format.timestamp(),
+            winston.format.printf(
+              (info) => `[${info.context}] ${info.level} ${info.message}`,
+            ),
+          ),
+        }),
+      ],
+    }),
     MovieModule,
     DirectorModule,
     GenreModule,

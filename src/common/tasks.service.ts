@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, LoggerService } from '@nestjs/common';
 import { Cron, SchedulerRegistry } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { readdir, unlink } from 'fs/promises';
@@ -6,6 +6,7 @@ import { join, parse } from 'path';
 import { Movie } from 'src/movie/entity/movie.entity';
 import { Repository } from 'typeorm';
 import { DefaultLogger } from './logger/default.logger';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 
 @Injectable()
 export class TasksService {
@@ -14,18 +15,20 @@ export class TasksService {
     @InjectRepository(Movie)
     private readonly movieRepository: Repository<Movie>,
     private readonly schedulerRegistry: SchedulerRegistry,
-    private readonly logger: DefaultLogger,
+    // private readonly logger: DefaultLogger,
+    @Inject(WINSTON_MODULE_NEST_PROVIDER)
+    private readonly logger: LoggerService,
   ) {}
 
   @Cron('*/5 * * * * *')
   async logEverySeconds() {
     // 순서대로 중요한 로그
-    this.logger.fatal('FATAL 레벨 로그');
-    this.logger.error('ERROR 레벨 로그');
-    this.logger.warn('WARN 레벨 로그');
-    this.logger.log('INFO 레벨 로그');
-    this.logger.debug('DEBUG 레벨 로그');
-    this.logger.verbose('VERBOSE 레벨 로그');
+    this.logger.fatal('FATAL 레벨 로그', null, TasksService.name); // context 이름을 넣어줌, fatal, error는 두 번째 인자에 message나 stack trace 인자를 받는다.
+    this.logger.error('ERROR 레벨 로그', null, TasksService.name);
+    this.logger.warn('WARN 레벨 로그', TasksService.name);
+    this.logger.log('INFO 레벨 로그', TasksService.name);
+    this.logger.debug('DEBUG 레벨 로그', TasksService.name);
+    this.logger.verbose('VERBOSE 레벨 로그', TasksService.name);
   }
 
   // @Cron('* * * * * *')
