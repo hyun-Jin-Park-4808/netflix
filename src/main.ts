@@ -8,8 +8,12 @@ async function bootstrap() {
     logger: ['verbose'], // verbose 이상의 로그만 보인다.
   });
   app.enableVersioning({
-    type: VersioningType.URI,
+    // type: VersioningType.URI,
     // defaultVersion: ['1', '2'], // 기본 버전 배열로도 설정 가능
+    // type: VersioningType.HEADER,
+    // header: 'version',
+    type: VersioningType.MEDIA_TYPE,
+    key: 'v=',
   });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(

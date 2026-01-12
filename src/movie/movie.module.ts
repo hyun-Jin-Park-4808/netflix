@@ -36,7 +36,8 @@ import { MovieService } from './movie.service';
     //   }),
     // }),
   ],
-  controllers: [MovieController, MovieControllerV2],
+  // MovieController에 version: VERSION_NEUTRAL 이기 때문에 MovieControllerV2 경로를 먼저 타려면 배열에 먼저 넣어줘야 한다.
+  controllers: [MovieControllerV2, MovieController],
   providers: [MovieService],
 })
 export class MovieModule {}
