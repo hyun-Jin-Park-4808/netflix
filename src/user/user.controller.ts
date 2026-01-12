@@ -18,7 +18,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @Controller('user')
 @ApiBearerAuth()
 @ApiTags('user')
-@UseInterceptors(ClassSerializerInterceptor) // @Exclude 적용
+@UseInterceptors(ClassSerializerInterceptor) // 조회할 컬럼 제외하는 데코레이터인 @Exclude 적용하기 위한 인터셉터
+// 즉, 컨트롤러에서 반환하는 객체를 그대로 JSON으로 보내지 않고, 클래스 메타데이터를 적용해서 변환한다.
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
