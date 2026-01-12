@@ -7,7 +7,7 @@ import { User } from 'src/user/entity/user.entity';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { MovieUserLike } from './entity/movie-user-like.entity';
 import { Movie } from './entity/movie.entity';
-import { MovieController, MovieControllerV2 } from './movie.controller';
+import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
 @Module({
   imports: [
@@ -37,7 +37,8 @@ import { MovieService } from './movie.service';
     // }),
   ],
   // MovieController에 version: VERSION_NEUTRAL 이기 때문에 MovieControllerV2 경로를 먼저 타려면 배열에 먼저 넣어줘야 한다.
-  controllers: [MovieControllerV2, MovieController],
+  // controllers: [MovieControllerV2, MovieController],
+  controllers: [MovieController],
   providers: [MovieService],
 })
 export class MovieModule {}

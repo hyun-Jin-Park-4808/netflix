@@ -32,20 +32,20 @@ import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
 
-@Controller({
-  path: 'movie',
-  version: '2',
-})
-export class MovieControllerV2 {
-  @Get()
-  getMovies() {
-    return [];
-  }
-}
+// @Controller({
+//   path: 'movie',
+//   version: '2',
+// })
+// export class MovieControllerV2 {
+//   @Get()
+//   getMovies() {
+//     return [];
+//   }
+// }
 
 @Controller({
   path: 'movie',
-  version: VERSION_NEUTRAL, // 버전 없거나 모든 버전에 대해 적용
+  // version: VERSION_NEUTRAL, // 버전 없거나 모든 버전에 대해 적용
 })
 @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {

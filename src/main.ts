@@ -2,19 +2,30 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe, VersioningType } from '@nestjs/common';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['verbose'], // verbose 이상의 로그만 보인다.
   });
-  app.enableVersioning({
-    // type: VersioningType.URI,
-    // defaultVersion: ['1', '2'], // 기본 버전 배열로도 설정 가능
-    // type: VersioningType.HEADER,
-    // header: 'version',
-    type: VersioningType.MEDIA_TYPE,
-    key: 'v=',
-  });
+  const config = new DocumentBuilder()
+    .setTitle('Netflix API')
+    .setDescription('Netflix NestJS 강의')
+    .setVersion('1.0')
+    .addTag('movie')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('doc', app, document);
+
+  // app.enableVersioning({
+  // type: VersioningType.URI,
+  // defaultVersion: ['1', '2'], // 기본 버전 배열로도 설정 가능
+  // type: VersioningType.HEADER,
+  // header: 'version',
+  // type: VersioningType.MEDIA_TYPE,
+  // key: 'v=',
+  // });
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
   app.useGlobalPipes(
     new ValidationPipe({
