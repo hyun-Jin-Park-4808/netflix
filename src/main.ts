@@ -3,7 +3,9 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: ['debug'], // debug 이상의 로그만 보인다.
+  });
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true, // dto에서 정의하지 않는 속성은 들어갈 수 없게 해준다. 에러는 발생 x, 기본은 false
