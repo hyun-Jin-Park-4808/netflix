@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entity/user.entity';
 import { UserService } from './user.service';
 
@@ -40,6 +41,10 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it('should be defined', () => {
     expect(userService).toBeDefined();
   });
@@ -56,11 +61,13 @@ describe('UserService', () => {
         id: 1,
         email: createUserDto.email,
         password: hashedPassword,
-      }
+      };
 
       jest.spyOn(mockUserRepository, 'findOne').mockResolvedValueOnce(null);
       jest.spyOn(mockConfigService, 'get').mockReturnValue(hashRounds);
-      jest.spyOn(bcrypt, 'hash').mockImplementation((password, hashRound) => hashedPassword);
+      jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation((password, hashRound) => hashedPassword);
       jest.spyOn(mockUserRepository, 'findOne').mockResolvedValueOnce(result);
 
       const createdUser = await userService.create(createUserDto);
@@ -73,7 +80,10 @@ describe('UserService', () => {
         where: { email: createUserDto.email },
       });
       expect(mockConfigService.get).toHaveBeenCalledWith(expect.anything());
-      expect(bcrypt.hash).toHaveBeenCalledWith(createUserDto.password, hashRounds);
+      expect(bcrypt.hash).toHaveBeenCalledWith(
+        createUserDto.password,
+        hashRounds,
+      );
       expect(mockUserRepository.save).toHaveBeenCalledWith({
         email: createUserDto.email,
         password: hashedPassword,
@@ -100,7 +110,7 @@ describe('UserService', () => {
     });
   });
 
-  describe("findAll", () => {
+  describe('findAll', () => {
     it('should return all users', async () => {
       const users = [
         {
@@ -120,7 +130,7 @@ describe('UserService', () => {
     });
   });
 
-  describe("findOne", () => {
+  describe('findOne', () => {
     it('should return a user by id', async () => {
       const user = {
         id: 1,
@@ -145,6 +155,61 @@ describe('UserService', () => {
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { id: 999 },
       });
+    });
+  });
+
+  describe('update', () => {
+    it('should update a user if it exists and return the updated user', async () => {
+      const updateUserDto: UpdateUserDto = {
+        email: 'user@example.com',
+        password: 'password',
+      };
+      const hashRounds = 10;
+      const hashedPassword = 'hashedPassword';
+      const user = {
+        id: 1,
+        email: updateUserDto.email,
+      };
+
+      jest.spyOn(mockUserRepository, 'findOne').mockResolvedValueOnce(user);
+      jest.spyOn(mockConfigService, 'get').mockReturnValue(hashRounds);
+      jest
+        .spyOn(bcrypt, 'hash')
+        .mockImplementation((password, hashRound) => hashedPassword);
+      jest.spyOn(mockUserRepository, 'update').mockResolvedValue(undefined);
+      jest
+        .spyOn(mockUserRepository, 'findOne')
+        .mockResolvedValueOnce({ ...user, password: hashedPassword });
+
+      const result = await userService.update(1, updateUserDto);
+
+      expect(result).toEqual({ ...user, password: hashedPassword });
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 1 },
+      });
+      expect(bcrypt.hash).toHaveBeenCalledWith(
+        updateUserDto.password,
+        hashRounds,
+      );
+      expect(mockUserRepository.update).toHaveBeenCalledWith({ id: 1 }, {
+        ...updateUserDto,
+        password: hashedPassword,
+      });
+    });
+
+    it('should throw a NotFoundException if user to update is not found', async () => {
+      jest.spyOn(mockUserRepository, 'findOne').mockResolvedValue(null);
+
+      const updateUserDto: UpdateUserDto = {
+        email: 'user@example.com',
+        password: 'password',
+      };
+
+      expect(userService.update(999, updateUserDto)).rejects.toThrow(NotFoundException);
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 999 },
+      });
+      expect(mockUserRepository.update).not.toHaveBeenCalled();
     });
   });
 
