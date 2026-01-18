@@ -54,7 +54,7 @@ describe('UserService', () => {
   });
 
   describe("findOne", () => {
-    it('should return one user by id', async () => {
+    it('should return a user by id', async () => {
       const user = {
         id: 1,
         email: 'user1@example.com',
@@ -74,7 +74,33 @@ describe('UserService', () => {
     it('should throw a NotFoundException if user not found', async () => {
       jest.spyOn(mockUserRepository, 'findOne').mockResolvedValue(null);
 
-      await expect(userService.findOne(999)).rejects.toThrow(NotFoundException);
+      expect(userService.findOne(999)).rejects.toThrow(NotFoundException);
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 999 },
+      });
+    });
+  });
+
+  describe('remove', () => {
+    it('should delete a user by id', async () => {
+      const id = 999;
+
+      jest.spyOn(mockUserRepository, 'findOne').mockResolvedValue({
+        id,
+      });
+
+      const result = await userService.remove(id);
+
+      expect(result).toEqual(id);
+      expect(mockUserRepository.findOne).toHaveBeenCalledWith({
+        where: { id },
+      });
+    });
+
+    it('should throw a NotFoundException if user to delete is not found', () => {
+      jest.spyOn(mockUserRepository, 'findOne').mockResolvedValue(null);
+
+      expect(userService.remove(999)).rejects.toThrow(NotFoundException);
       expect(mockUserRepository.findOne).toHaveBeenCalledWith({
         where: { id: 999 },
       });
