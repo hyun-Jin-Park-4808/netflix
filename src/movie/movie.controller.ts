@@ -31,7 +31,12 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller({
   path: 'movie',
