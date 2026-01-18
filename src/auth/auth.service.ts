@@ -8,16 +8,18 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcrypt';
 import { envVarableKeys } from 'src/common/const/env.const';
 import { Role, User } from 'src/user/entity/user.entity';
+import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER)
@@ -113,21 +115,7 @@ export class AuthService {
   // rawToken => "Basic $token" 형태로 Base64로 인코딩되어 있다. 여기서 token을 추출해야한다.
   async register(rawToken: string) {
     const { email, password } = this.parseBasicToken(rawToken);
-    const user = await this.userRepository.findOne({ where: { email } });
-
-    if (user) {
-      throw new BadRequestException('이미 존재하는 사용자입니다.');
-    }
-
-    // Round 넣어주면 salt값은 알아서 생성된다.
-    const hash = await bcrypt.hash(
-      password,
-      this.configService.get<number>(envVarableKeys.hashRounds),
-    );
-
-    await this.userRepository.save({ email, password: hash });
-
-    return this.userRepository.findOne({ where: { email } });
+    return await this.userService.create({ email, password });
   }
 
   async authenticate(email: string, password: string) {
