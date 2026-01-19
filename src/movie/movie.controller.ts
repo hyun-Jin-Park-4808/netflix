@@ -17,8 +17,13 @@ import {
   Query,
   Request,
   UseInterceptors,
-  VERSION_NEUTRAL,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Public } from 'src/auth/decorator/public.decorator';
 import { RBAC } from 'src/auth/decorator/rbac.decorator';
 import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
@@ -31,12 +36,6 @@ import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
 
 @Controller({
   path: 'movie',
@@ -81,11 +80,11 @@ export class MovieController {
   getMovie(
     @Param(
       'id',
-      new ParseIntPipe({
-        exceptionFactory(error) {
-          throw new BadRequestException(`숫자를 입력해주세요. ${error}`);
-        },
-      }),
+      // new ParseIntPipe({
+      //   exceptionFactory(error) {
+      //     throw new BadRequestException(`숫자를 입력해주세요. ${error}`);
+      //   },
+      // }),
     )
     id: number,
   ) {
@@ -97,7 +96,6 @@ export class MovieController {
   @RBAC(Role.admin)
   @UseInterceptors(TransactionInterceptor)
   postMovie(
-    @Request() req: any,
     @Body() body: CreateMovieDto,
     @QueryRunner() queryRunner: QR,
     @UserId() userId: number,
