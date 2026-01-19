@@ -60,9 +60,9 @@ export class AuthController {
     };
   }
 
-  @UseGuards(JwtAuthGuard) // 가드 통과 안하면 아예 아래 요청 로직 실행 안된다.
-  @Get('private')
-  async private(@Request() req: any) {
-    return req.user;
-  }
+  // @UseGuards(JwtAuthGuard) // 가드 통과 안하면 아예 아래 요청 로직 실행 안된다.
+  // @Get('private')
+  // async private(@Request() req: any) {
+  //   return req.user;
+  // }
 }

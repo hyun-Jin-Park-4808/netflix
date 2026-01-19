@@ -32,7 +32,7 @@ export class AuthService {
     const now = +new Date();
     const differenceInSeconds = (expiryDate - now) / 1000; // 초 단위로 변환하기 위해 /1000 적용.
     await this.cacheManager.set(
-      `BOLOCK_TOKEN_${token}`,
+      `BLOCK_TOKEN_${token}`,
       payload,
       Math.max(differenceInSeconds * 1000, 1),
     );
