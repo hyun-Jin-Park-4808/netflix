@@ -1,8 +1,8 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
+import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -20,7 +20,7 @@ async function bootstrap() {
   SwaggerModule.setup('doc', app, document, {
     swaggerOptions: {
       persistAuthorization: true, // 스웨거 새로고침해도 기억하게 하는 옵션
-    }
+    },
   });
 
   // app.enableVersioning({

@@ -4,11 +4,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { Movie } from 'src/movie/entity/movie.entity';
-import { v4 } from 'uuid';
 import { CommonController } from './common.controller';
 import { CommonService } from './common.service';
 import { TasksService } from './tasks.service';
 import { DefaultLogger } from './logger/default.logger';
+import { v4 } from 'uuid';
 
 @Module({
   imports: [
