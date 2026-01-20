@@ -4,12 +4,11 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { Role, User } from 'src/user/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
-import * as bcrypt from 'bcrypt';
-import { before, mock } from 'node:test';
 
 const mockUserRepository = {
   findOne: jest.fn(),

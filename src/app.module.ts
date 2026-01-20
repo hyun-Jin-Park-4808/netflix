@@ -1,38 +1,31 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { CacheModule } from '@nestjs/cache-manager';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { ScheduleModule } from '@nestjs/schedule';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
-import { MovieModule } from './movie/movie.module';
-import { Movie } from './movie/entity/movie.entity';
-import { MovieDetail } from './movie/entity/movie-detail.entity';
-import { DirectorModule } from './director/director.module';
-import { Director } from './director/entity/director.entity';
-import { GenreModule } from './genre/genre.module';
-import { Genre } from './genre/entity/genre.entity';
+import { WinstonModule } from 'nest-winston';
+import { join } from 'path';
+import * as winston from 'winston';
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { User } from './user/entity/user.entity';
-import { envVarableKeys } from './common/const/env.const';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RBACGuard } from './auth/guard/rbac.guard';
-import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
-import { ForbiddenExceptionFilter } from './common/filter/forbidden.filter';
+import { envVarableKeys } from './common/const/env.const';
 import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { MovieUserLike } from './movie/entity/movie-user-like.entity';
-import { CacheModule } from '@nestjs/cache-manager';
+import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
 import { ThrottleInterceptor } from './common/interceptor/throttle.interceptor';
-import { ScheduleModule } from '@nestjs/schedule';
-import { WinstonModule } from 'nest-winston';
-import * as winston from 'winston';
-import { BearerTokenMiddleware } from './auth/middleware/bearer-token.middleware';
+import { DirectorModule } from './director/director.module';
+import { Director } from './director/entity/director.entity';
+import { Genre } from './genre/entity/genre.entity';
+import { GenreModule } from './genre/genre.module';
+import { MovieDetail } from './movie/entity/movie-detail.entity';
+import { MovieUserLike } from './movie/entity/movie-user-like.entity';
+import { Movie } from './movie/entity/movie.entity';
+import { MovieModule } from './movie/movie.module';
+import { User } from './user/entity/user.entity';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
