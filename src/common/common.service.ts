@@ -19,14 +19,13 @@ export class CommonService {
 
   constructor(private readonly configService: ConfigService) {
     this.s3 = new S3({
+      region: configService.get<string>(envVarableKeys.awsRegion),
       credentials: {
         accessKeyId: configService.get<string>(envVarableKeys.awsAccessKeyId),
         secretAccessKey: configService.get<string>(
           envVarableKeys.awsSecretAccessKey,
         ),
       },
-
-      region: configService.get<string>(envVarableKeys.awsRegion),
     });
   }
 
