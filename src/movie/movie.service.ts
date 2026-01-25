@@ -20,6 +20,8 @@ import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { MovieUserLike } from './entity/movie-user-like.entity';
 import { Movie } from './entity/movie.entity';
+import { ConfigService } from '@nestjs/config';
+import { envVarableKeys } from 'src/common/const/env.const';
 
 @Injectable() // IoC에서 AppService를 인스턴스화해서 다른 클래스에 알아서 주입할 수 있도록 관리하게 된다.
 export class MovieService {
@@ -36,6 +38,7 @@ export class MovieService {
     private readonly commonService: CommonService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache, // 메모리에 있기 때문에 재시작하면 리셋된다.
+    private readonly configService: ConfigService,
   ) {}
 
   async findRecent() {
@@ -196,11 +199,17 @@ export class MovieService {
     movieFolder: string,
     createMovieDto: CreateMovieDto,
   ) {
-    return rename(
+    if (this.configService.get<string>(envVarableKeys.env) !== 'prod') {
       // transaction 범위에 포함되지 않기 때문에 transaction 범위 끝나고 실행하기
-      join(process.cwd(), tempFolder, createMovieDto.movieFileName),
-      join(process.cwd(), movieFolder, createMovieDto.movieFileName),
-    );
+      return rename(
+        join(process.cwd(), tempFolder, createMovieDto.movieFileName),
+        join(process.cwd(), movieFolder, createMovieDto.movieFileName),
+      );
+    } else {
+      return this.commonService.saveMovieToPermanentStorage(
+        createMovieDto.movieFileName,
+      );
+    }
   }
 
   async create(

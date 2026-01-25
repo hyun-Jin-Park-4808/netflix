@@ -7,11 +7,14 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CommonService } from './common.service';
 
 @Controller('common')
 @ApiBearerAuth()
 @ApiTags('common')
 export class CommonController {
+  constructor(private readonly commonService: CommonService) {}
+
   @Post('video')
   @UseInterceptors(
     FileInterceptor('video', {
@@ -41,5 +44,11 @@ export class CommonController {
     return {
       fileName: video.filename,
     };
+  }
+
+  @Post('presigned-url')
+  async createPresignedUrl() {
+    // 해당 api 호출해서 반환된 Url로 body에 binary 선택 후 PUT 요청으로 파일 업로드하면 파일 저장된다.
+    return { url: await this.commonService.createPresignedUrl() };
   }
 }

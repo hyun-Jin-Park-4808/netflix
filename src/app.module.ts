@@ -44,6 +44,10 @@ import { UserModule } from './user/user.module';
         HASH_ROUNDS: Joi.number().required(),
         ACCESS_TOKEN_SECRET: Joi.string().required(),
         REFRESH_TOKEN_SECRET: Joi.string().required(),
+        AWS_ACCESS_KEY_ID: Joi.string().required(),
+        AWS_SECRET_ACCESS_KEY: Joi.string().required(),
+        AWS_REGION: Joi.string().required(),
+        BUCKET_NAME: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({
@@ -55,7 +59,16 @@ import { UserModule } from './user/user.module';
         password: configService.get<string>(envVarableKeys.dbPassword),
         database: configService.get<string>(envVarableKeys.dbDatabase),
         entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
-        synchronize: true, // 실서버에서는 false로 해야 한다.
+        synchronize:
+          configService.get<string>(envVarableKeys.env) === 'prod'
+            ? false // 실서버에서는 false
+            : true, // 테스트 서버
+        ...(configService.get<string>(envVarableKeys.env) === 'prod' && {
+          // 환경변수가 prod면 ssl 옵션을 추가한다., A && B: A이 true이면 B를 실행하고, false이면 false를 반환한다.
+          ssl: {
+            rejectUnauthorized: false,
+          },
+        }),
       }),
       inject: [ConfigService], // IoC 컨테이너에서 ConfigService를 DI 해줘야한다고 알려주기 위함
     }),
