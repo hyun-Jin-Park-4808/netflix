@@ -1,15 +1,14 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entity/genre.entity';
-import { Role, User } from 'src/user/entity/user.entity';
 import * as request from 'supertest';
+import { DataSource } from 'typeorm';
 import { AppModule } from '../app.module';
+import { AuthService } from '../auth/auth.service';
+import { Director } from '../director/entity/director.entity';
+import { Genre } from '../genre/entity/genre.entity';
+import { Role, User } from '../user/entity/user.entity';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { Movie } from './entity/movie.entity';
-import { DataSource } from 'typeorm';
-import { MovieUserLike } from './entity/movie-user-like.entity';
-import { AuthService } from 'src/auth/auth.service';
 
 describe('MovieController (e2e)', () => {
   let app: INestApplication;
@@ -41,7 +40,6 @@ describe('MovieController (e2e)', () => {
 
     dataSource = app.get<DataSource>(DataSource);
 
-    const movieUserLikeRepository = dataSource.getRepository(MovieUserLike);
     const movieRepository = dataSource.getRepository(Movie);
     const movieDetailRepository = dataSource.getRepository(MovieDetail);
     const userRepository = dataSource.getRepository(User);

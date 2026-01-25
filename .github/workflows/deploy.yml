@@ -9,6 +9,20 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest ## 실행할 OS
 
+    services: ## 실행할 서비스 지정
+      postgres:
+        image: postgres:16 ## postgres 이미지 지정
+        env:
+          POSTGRES_USER: postgres ## postgres 사용자 지정
+          POSTGRES_PASSWORD: postgres ## postgres 비밀번호 지정
+        options: >- ## postgres 설정 옵션 지정: postgres 상태 확인 명령 지정, postgres 상태 확인 주기 지정, postgres 상태 확인 시간 지정, postgres 상태 확인 재시도 지정
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s 
+          --health-retries 5s
+        ports: ## 실행할 이미지의 포트 : 연결할 postgres 포트 지정
+          - 5433:5432
+        
     steps:
       - name: Checkout Code
         uses: actions/checkout@v3 ## 최신버전의 소스코드 가져옴
@@ -17,12 +31,78 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+        
+      - name: Create Env File
+        env:
+          ENV: ${{secrets.ENV}}
+          DB_TYPE: ${{secrets.DB_TYPE}}
+          DB_HOST: ${{secrets.DB_HOST}}
+          DB_PORT: ${{secrets.DB_PORT}}
+          DB_USERNAME: ${{secrets.DB_USERNAME}}
+          DB_PASSWORD: ${{secrets.DB_PASSWORD}}
+          DB_DATABASE: ${{secrets.DB_DATABASE}}
+          HASH_ROUNDS: ${{secrets.HASH_ROUNDS}}
+          ACCESS_TOKEN_SECRET: ${{secrets.ACCESS_TOKEN_SECRET}}
+          REFRESH_TOKEN_SECRET: ${{secrets.REFRESH_TOKEN_SECRET}}
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_REGION: ${{secrets.AWS_REGION}}
+          BUCKET_NAME: ${{secrets.BUCKET_NAME}}
+        run: | ## 환경변수 파일 생성(toduch test.env), echo ENV="test" >> test.env => ENV="test" 이라는 환경변수를 test.env 파일에 저장한다.
+          touch test.env
+          echo ENV="test" >> test.env
+          echo DB_TYPE="$DB_TYPE" >> test.env
+          echo DB_HOST="localhost" >> test.env
+          echo DB_PORT="$DB_PORT" >> test.env
+          echo DB_USERNAME="$DB_USERNAME" >> test.env
+          echo DB_PASSWORD="$DB_PASSWORD" >> test.env
+          echo DB_DATABASE="$DB_DATABASE" >> test.env
+          echo HASH_ROUNDS="$HASH_ROUNDS" >> test.env
+          echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" >> test.env
+          echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> test.env
+          echo AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" >> test.env
+          echo AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" >> test.env
+          echo AWS_REGION="$AWS_REGION" >> test.env
+          echo BUCKET_NAME="$BUCKET_NAME" >> test.env
+          echo "test.env 환경변수 파일 생성 완료"
+          cat test.env
+
+          touch .env
+          echo DB_TYPE="$DB_TYPE" >> .env
+          echo DB_HOST="$DB_HOST" >> .env
+          echo DB_PORT="$DB_PORT" >> .env
+          echo DB_USERNAME="$DB_USERNAME" >> .env
+          echo DB_PASSWORD="$DB_PASSWORD" >> .env
+          echo DB_DATABASE="$DB_DATABASE" >> .env
+          echo HASH_ROUNDS="$HASH_ROUNDS" >> .env
+          echo ACCESS_TOKEN_SECRET="$ACCESS_TOKEN_SECRET" >> .env
+          echo REFRESH_TOKEN_SECRET="$REFRESH_TOKEN_SECRET" >> .env
+          echo AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" >> .env
+          echo AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" >> .env
+          echo AWS_REGION="$AWS_REGION" >> .env
+          echo BUCKET_NAME="$BUCKET_NAME" >> .env
+          echo ".env 환경변수 파일 생성 완료"
+          cat .env
+
+      - name: Create Folders
+        run: | ## 폴더 생성
+          mkdir -p public/temp
+          mkdir -p public/movie
 
       - name: Install Dependencies
         run: npm install
 
       - name: Build Project
         run: npm run build
+
+      - name: Run Test
+        run: npm run test
+        
+      - name: Install Typeorm
+        run: npm install -g typeorm
+
+      - name: Run Migration
+        run: typeorm migration:run -d ./dist/database/data-source.js
 
       - name: Zip Artifact for Deployment
         run: zip -r deploy.zip . ## 현재 위치에서 압축해서 deploy.zip 파일을 생성

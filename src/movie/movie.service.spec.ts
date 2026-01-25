@@ -6,10 +6,10 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { CommonService } from 'src/common/common.service';
-import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entity/genre.entity';
-import { User } from 'src/user/entity/user.entity';
+import { CommonService } from '../common/common.service';
+import { Director } from '../director/entity/director.entity';
+import { Genre } from '../genre/entity/genre.entity';
+import { User } from '../user/entity/user.entity';
 import { DataSource, In, QueryRunner, Repository } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
@@ -23,8 +23,6 @@ describe('MovieService', () => {
   let movieService: MovieService;
   let movieRepository: jest.Mocked<Repository<Movie>>;
   let movieDetailRepository: jest.Mocked<Repository<MovieDetail>>;
-  let directorRepository: jest.Mocked<Repository<Director>>;
-  let genreRepository: jest.Mocked<Repository<Genre>>;
   let userRepository: jest.Mocked<Repository<User>>;
   let movieUserLikeRepository: jest.Mocked<Repository<MovieUserLike>>;
   let dataSource: jest.Mocked<DataSource>;
@@ -33,14 +31,11 @@ describe('MovieService', () => {
 
   beforeEach(async () => {
     const { unit, unitRef } = TestBed.create(MovieService).compile();
-
     movieService = unit;
     movieRepository = unitRef.get(getRepositoryToken(Movie) as string);
     movieDetailRepository = unitRef.get(
       getRepositoryToken(MovieDetail) as string,
     );
-    directorRepository = unitRef.get(getRepositoryToken(Director) as string);
-    genreRepository = unitRef.get(getRepositoryToken(Genre) as string);
     userRepository = unitRef.get(getRepositoryToken(User) as string);
     movieUserLikeRepository = unitRef.get(
       getRepositoryToken(MovieUserLike) as string,

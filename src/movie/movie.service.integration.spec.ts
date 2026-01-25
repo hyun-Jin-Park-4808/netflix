@@ -1,18 +1,19 @@
 import { Cache, CACHE_MANAGER, CacheModule } from '@nestjs/cache-manager';
+import { NotFoundException } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CommonService } from 'src/common/common.service';
-import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entity/genre.entity';
-import { User } from 'src/user/entity/user.entity';
+import { CommonService } from '../common/common.service';
+import { Director } from '../director/entity/director.entity';
+import { Genre } from '../genre/entity/genre.entity';
+import { User } from '../user/entity/user.entity';
 import { DataSource } from 'typeorm';
+import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieDetail } from './entity/movie-detail.entity';
 import { MovieUserLike } from './entity/movie-user-like.entity';
 import { Movie } from './entity/movie.entity';
 import { MovieService } from './movie.service';
-import { CreateMovieDto } from './dto/create-movie.dto';
-import { UpdateMovieDto } from './dto/update-movie.dto';
-import { NotFoundException } from '@nestjs/common';
 
 describe('MovieService - Integration Test', () => {
   let service: MovieService;
@@ -48,6 +49,7 @@ describe('MovieService - Integration Test', () => {
           User,
           MovieUserLike,
         ]),
+        ConfigModule.forRoot(),
       ],
       providers: [MovieService, CommonService],
     }).compile();
