@@ -1,6 +1,6 @@
 import { BaseTable } from 'src/common/entity/base-table.entity';
 import { User } from 'src/user/entity/user.entity';
-import { Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { ChatRoom } from './chat-room.entity';
 
 @Entity()
@@ -13,4 +13,7 @@ export class Chat extends BaseTable {
 
   @ManyToOne(() => ChatRoom, (chatRoom) => chatRoom.chats)
   chatRoom: ChatRoom;
+
+  @Column()
+  message: string;
 }
