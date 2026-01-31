@@ -1,11 +1,12 @@
+import * as ffmpeg from '@ffmpeg-installer/ffmpeg';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as session from 'express-session';
+import * as ffprobe from 'ffprobe-static';
+import * as ffmpegFluent from 'fluent-ffmpeg';
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston';
 import { AppModule } from './app.module';
-import * as ffmpeg from '@ffmpeg-installer/ffmpeg';
-import * as ffmpegFluent from 'fluent-ffmpeg';
-import * as ffprobe from 'ffprobe-static';
 
 ffmpegFluent.setFfmpegPath(ffmpeg.path);
 ffmpegFluent.setFfprobePath(ffprobe.path);
@@ -47,6 +48,17 @@ async function bootstrap() {
       },
     }),
   );
+
+  // 세션 미들웨어 등록, 서버에서 사용자별 상태를 저장할 수 있게 해준다. 
+  // 세션 id를 서버에서 Set-Cookie 헤더에 담아 브라우저에 보낼 때, secret에 넣은 비밀키를 사용해 서명을 한다.
+  // 브라우저에서는 connect.sid 라는 쿠키를 저장한다. 
+  // 서명을 통해 브라우저가 쿠키를 임의로 조작했는지 확인하고, 조작됐다면 서버가 이를 감지하고 무시한다. 
+  app.use(
+    session({
+      secret: 'my-secret-key',
+    }),
+  );
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

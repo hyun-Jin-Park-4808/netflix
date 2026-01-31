@@ -15,6 +15,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   Request,
   UseInterceptors,
 } from '@nestjs/common';
@@ -87,7 +88,15 @@ export class MovieController {
       // }),
     )
     id: number,
+    @Req() request: any,
   ) {
+    const session = request.session;
+    const movieCount = session.movieCount ?? {};
+    request.session.movieCount = {
+      ...movieCount,
+      [id]: (movieCount[id] ?? 0) + 1,
+    };
+    console.log(session);
     // number로 변환 및 검증
     return this.movieService.findOne(id);
   }
