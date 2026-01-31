@@ -1,12 +1,9 @@
 import {
-  ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { Socket } from 'dgram';
+import { Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 import { ChatService } from './chat.service';
 
@@ -16,9 +13,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly chatService: ChatService,
     private readonly authService: AuthService,
   ) {}
-  handleDisconnect(client: any) {
-    return;
+
+  handleDisconnect(client: Socket) {
+    const user = client.data.user;
+    if (user) {
+      this.chatService.removeClient(user.sub);
+    }
   }
+
   async handleConnection(client: any, ...args: any[]) {
     try {
       // Bearer '~~'
@@ -26,6 +28,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const payload = await this.authService.parseBearerToken(rawToken, false);
       if (payload) {
         client.data.user = payload;
+        this.chatService.registerClient(payload.sub, client);
+        this.chatService.joinUserRooms(payload, client);
       } else {
         client.disconnect();
       }
@@ -33,28 +37,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       console.log(e);
       client.disconnect();
     }
-  }
-
-  @SubscribeMessage('receiveMessage')
-  async receiveMessage(
-    @MessageBody() data: { message: string }, // 받은 데이터의 정보
-    @ConnectedSocket() client: Socket, // 연결된 클라이언트의 정보
-  ) {
-    console.log(data);
-    console.log(client);
-  }
-
-  @SubscribeMessage('sendMessage') // 우리가 리스닝하고 있는 이벤트 이름
-  async sendMessage(
-    @MessageBody() data: { message: string }, // 보낼 데이터의 정보
-    @ConnectedSocket() client: Socket, // 연결된 클라이언트의 정보
-  ) {
-    client.emit('sendMessage', {
-      // sendMessage: 상대가 리스닝하고 있는 이벤트 이름
-      ...data,
-      from: 'server',
-    });
-    console.log(data);
-    console.log(client);
   }
 }
