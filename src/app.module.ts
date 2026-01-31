@@ -27,6 +27,8 @@ import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
 import { ChatModule } from './chat/chat.module';
+import { ChatRoom } from './chat/entity/chat-room.entity';
+import { Chat } from './chat/entity/chat.entity';
 
 @Module({
   imports: [
@@ -59,7 +61,16 @@ import { ChatModule } from './chat/chat.module';
         username: configService.get<string>(envVarableKeys.dbUsername),
         password: configService.get<string>(envVarableKeys.dbPassword),
         database: configService.get<string>(envVarableKeys.dbDatabase),
-        entities: [Movie, MovieDetail, Director, Genre, User, MovieUserLike],
+        entities: [
+          Movie,
+          MovieDetail,
+          Director,
+          Genre,
+          User,
+          MovieUserLike,
+          Chat,
+          ChatRoom,
+        ],
         synchronize:
           configService.get<string>(envVarableKeys.env) === 'prod'
             ? false // 실서버에서는 false
