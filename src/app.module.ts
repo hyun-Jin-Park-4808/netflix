@@ -26,6 +26,7 @@ import { Movie } from './movie/entity/movie.entity';
 import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -118,6 +119,7 @@ import { UserModule } from './user/user.module';
     GenreModule,
     AuthModule,
     UserModule,
+    ChatModule,
   ], // 다른 모듈을 이 모듈로 불러들일 때 사용, nest g로 생성한 모듈은 자동 주입 된다.
   providers: [
     {
