@@ -1,14 +1,17 @@
+import { BullModule } from '@nestjs/bullmq';
 import { Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import { Movie } from 'src/movie/entity/movie.entity';
+import { v4 } from 'uuid';
 import { CommonController } from './common.controller';
 import { CommonService } from './common.service';
-import { TasksService } from './tasks.service';
 import { DefaultLogger } from './logger/default.logger';
-import { v4 } from 'uuid';
+import { TasksService } from './tasks.service';
+import { ConfigService } from '@nestjs/config';
+import { envVarableKeys } from './const/env.const';
 
 @Module({
   imports: [
@@ -28,6 +31,20 @@ import { v4 } from 'uuid';
       }),
     }),
     TypeOrmModule.forFeature([Movie]),
+    BullModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        connection: {
+          host: configService.get<string>(envVarableKeys.redisHost),
+          port: configService.get<number>(envVarableKeys.redisPort),
+          username: configService.get<string>(envVarableKeys.redisUsername),
+          password: configService.get<string>(envVarableKeys.redisPassword),
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    BullModule.registerQueue({
+      name: 'thumbnail-generation', // 작업할 큐의 이름
+    }),
   ],
   controllers: [CommonController],
   providers: [CommonService, TasksService, DefaultLogger],

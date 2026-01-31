@@ -1,6 +1,6 @@
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConditionalModule, ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -12,6 +12,9 @@ import * as winston from 'winston';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/guard/auth.guard';
 import { RBACGuard } from './auth/guard/rbac.guard';
+import { ChatModule } from './chat/chat.module';
+import { ChatRoom } from './chat/entity/chat-room.entity';
+import { Chat } from './chat/entity/chat.entity';
 import { envVarableKeys } from './common/const/env.const';
 import { QueryFailedErrorFilter } from './common/filter/query-failed.filter';
 import { ResponseTimeInterceptor } from './common/interceptor/response-time.interceptor';
@@ -26,9 +29,7 @@ import { Movie } from './movie/entity/movie.entity';
 import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
-import { ChatModule } from './chat/chat.module';
-import { ChatRoom } from './chat/entity/chat-room.entity';
-import { Chat } from './chat/entity/chat.entity';
+import { WorkerModule } from './worker/worker.module';
 
 @Module({
   imports: [
@@ -51,6 +52,10 @@ import { Chat } from './chat/entity/chat.entity';
         AWS_SECRET_ACCESS_KEY: Joi.string().required(),
         AWS_REGION: Joi.string().required(),
         BUCKET_NAME: Joi.string().required(),
+        REDIS_HOST: Joi.string().required(),
+        REDIS_PORT: Joi.number().required(),
+        REDIS_USERNAME: Joi.string().required(),
+        REDIS_PASSWORD: Joi.string().required(),
       }),
     }),
     TypeOrmModule.forRootAsync({
@@ -131,6 +136,12 @@ import { Chat } from './chat/entity/chat.entity';
     AuthModule,
     UserModule,
     ChatModule,
+    // TYPE이라는 환경변수가 worker 타입일 때만 WorkerModule을 등록한다.
+    // package.json에서 등록할 수 있다. => "start:dev:worker": "export TYPE=worker && export PORT=3001 && nest start --watch",
+    ConditionalModule.registerWhen(
+      WorkerModule,
+      (env: NodeJS.ProcessEnv) => env['TYPE'] === 'worker',
+    ),
   ], // 다른 모듈을 이 모듈로 불러들일 때 사용, nest g로 생성한 모듈은 자동 주입 된다.
   providers: [
     {

@@ -1,3 +1,4 @@
+import { InjectQueue } from '@nestjs/bullmq';
 import {
   BadRequestException,
   Controller,
@@ -7,13 +8,18 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Queue } from 'bullmq';
 import { CommonService } from './common.service';
 
 @Controller('common')
 @ApiBearerAuth()
 @ApiTags('common')
 export class CommonController {
-  constructor(private readonly commonService: CommonService) {}
+  constructor(
+    private readonly commonService: CommonService,
+    @InjectQueue('thumbnail-generation')
+    private readonly thumbnailQueue: Queue,
+  ) {}
 
   @Post('video')
   @UseInterceptors(
@@ -29,7 +35,7 @@ export class CommonController {
       },
     }),
   )
-  createVideo(
+  async createVideo(
     // @UploadedFiles() files: Express.Multer.File[],
     // @UploadedFile(
     //   new MovieFilePipe({
@@ -41,6 +47,19 @@ export class CommonController {
     // 인터셉터 전에 적용되는 미들웨어 -> 가드 (-> 인터셉터) 에서 파일 업로드를 막아야한다.
     @UploadedFile() video: Express.Multer.File,
   ) {
+    // 우리 서버가 producer가 된다.
+    await this.thumbnailQueue.add('thumbnail', {
+      // 작업 이름 지정: 'thumbnail'
+      videoId: video.filename, // 전달할 데이터
+      videoPath: video.path,
+    }, {
+      priority: 1, // 해당 작업의 우선순위
+      delay: 100, // 100ms 후에 작업을 실행한다.
+      attempts: 3, // 최대 3번까지 재시도
+      lifo: true, // stack 구조로 처리
+      removeOnComplete: true, // 작업 완료 후 자동으로 삭제
+      removeOnFail: true, // 작업 실패 후 자동으로 삭제
+    });
     return {
       fileName: video.filename,
     };
