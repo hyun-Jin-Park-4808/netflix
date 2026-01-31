@@ -144,7 +144,7 @@ describe('AuthService', () => {
       jest.spyOn(jwtService, 'verifyAsync').mockResolvedValue(payload);
       jest.spyOn(mockConfigService, 'get').mockReturnValue('secret');
 
-      const result = await authService.parseBearerToeken(rawToken, false);
+      const result = await authService.parseBearerToken(rawToken, false);
       expect(jwtService.verifyAsync).toHaveBeenCalledWith('token', {
         secret: 'secret',
       });
@@ -154,14 +154,14 @@ describe('AuthService', () => {
     it('should throw a BadRequestException for an invalid bearer token format', async () => {
       const rawToken = 'a';
       await expect(
-        authService.parseBearerToeken(rawToken, false),
+        authService.parseBearerToken(rawToken, false),
       ).rejects.toThrow(BadRequestException);
     });
 
     it('should throw a BadRequestException for token not starting with Bearer', async () => {
       const rawToken = 'Basic a';
       await expect(
-        authService.parseBearerToeken(rawToken, false),
+        authService.parseBearerToken(rawToken, false),
       ).rejects.toThrow(BadRequestException);
     });
 
@@ -172,7 +172,7 @@ describe('AuthService', () => {
         type: 'refresh',
       });
       await expect(
-        authService.parseBearerToeken(rawToken, false),
+        authService.parseBearerToken(rawToken, false),
       ).rejects.toThrow(UnauthorizedException);
     });
 
@@ -183,7 +183,7 @@ describe('AuthService', () => {
         type: 'access',
       });
       await expect(
-        authService.parseBearerToeken(rawToken, true),
+        authService.parseBearerToken(rawToken, true),
       ).rejects.toThrow(UnauthorizedException);
     });
   });

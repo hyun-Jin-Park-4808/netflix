@@ -1,15 +1,39 @@
 import {
   ConnectedSocket,
   MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
-import { ChatService } from './chat.service';
 import { Socket } from 'dgram';
+import { AuthService } from 'src/auth/auth.service';
+import { ChatService } from './chat.service';
 
 @WebSocketGateway()
-export class ChatGateway {
-  constructor(private readonly chatService: ChatService) {}
+export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
+  constructor(
+    private readonly chatService: ChatService,
+    private readonly authService: AuthService,
+  ) {}
+  handleDisconnect(client: any) {
+    return;
+  }
+  async handleConnection(client: any, ...args: any[]) {
+    try {
+      // Bearer '~~'
+      const rawToken = client.handshake.headers.authorization;
+      const payload = await this.authService.parseBearerToken(rawToken, false);
+      if (payload) {
+        client.data.user = payload;
+      } else {
+        client.disconnect();
+      }
+    } catch (e) {
+      console.log(e);
+      client.disconnect();
+    }
+  }
 
   @SubscribeMessage('receiveMessage')
   async receiveMessage(

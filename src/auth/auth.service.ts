@@ -8,11 +8,11 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 import { envVarableKeys } from 'src/common/const/env.const';
 import { Role, User } from 'src/user/entity/user.entity';
 import { UserService } from 'src/user/user.service';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -73,7 +73,7 @@ export class AuthService {
   }
 
   // 미들웨어로 옮긴 코드
-  async parseBearerToeken(rawToken: string, isRefreshToken: boolean) {
+  async parseBearerToken(rawToken: string, isRefreshToken: boolean) {
     const basicSplit = rawToken.split(' ');
 
     if (basicSplit.length !== 2) {

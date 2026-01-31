@@ -52,7 +52,4 @@ export class User extends BaseTable {
 
   @ManyToMany(() => ChatRoom, (chatRoom) => chatRoom.users)
   chatRooms: ChatRoom[];
-
-  @Column()
-  message: string;
 }
