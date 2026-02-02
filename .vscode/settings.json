@@ -6,5 +6,9 @@
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
   },
-  "files.autoSave": "afterDelay"
+  "files.autoSave": "afterDelay",
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "prisma.pinToPrisma6": true
 }

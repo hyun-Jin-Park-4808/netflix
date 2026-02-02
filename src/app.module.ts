@@ -45,6 +45,7 @@ import { WorkerModule } from './worker/worker.module';
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_DATABASE: Joi.string().required(),
+        DB_URL: Joi.string().required(),
         HASH_ROUNDS: Joi.number().required(),
         ACCESS_TOKEN_SECRET: Joi.string().required(),
         REFRESH_TOKEN_SECRET: Joi.string().required(),
@@ -60,12 +61,13 @@ import { WorkerModule } from './worker/worker.module';
     }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
+        url: configService.get<string>(envVarableKeys.dbUrl),
         type: configService.get<string>(envVarableKeys.dbType) as 'postgres',
-        host: configService.get<string>(envVarableKeys.dbHost),
-        port: configService.get<number>(envVarableKeys.dbPort),
-        username: configService.get<string>(envVarableKeys.dbUsername),
-        password: configService.get<string>(envVarableKeys.dbPassword),
-        database: configService.get<string>(envVarableKeys.dbDatabase),
+        // host: configService.get<string>(envVarableKeys.dbHost),
+        // port: configService.get<number>(envVarableKeys.dbPort),
+        // username: configService.get<string>(envVarableKeys.dbUsername),
+        // password: configService.get<string>(envVarableKeys.dbPassword),
+        // database: configService.get<string>(envVarableKeys.dbDatabase),
         entities: [
           Movie,
           MovieDetail,
