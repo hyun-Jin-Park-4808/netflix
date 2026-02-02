@@ -31,12 +31,12 @@ import { QueryRunner } from 'src/common/decorator/query.runner.decorator';
 import { Throttle } from 'src/common/decorator/throttle.decorator';
 import { TransactionInterceptor } from 'src/common/interceptor/transaction.interceptor';
 import { UserId } from 'src/user/decorator/user-id.decorator';
-import { Role } from 'src/user/entity/user.entity';
 import { QueryRunner as QR } from 'typeorm';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { GetMoviesDto } from './dto/get-movies.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieService } from './movie.service';
+import { Role } from '@prisma/client';
 
 @Controller({
   path: 'movie',
@@ -88,28 +88,32 @@ export class MovieController {
       // }),
     )
     id: number,
-    @Req() request: any,
+    // @Req() request: any,
   ) {
-    const session = request.session;
-    const movieCount = session.movieCount ?? {};
-    request.session.movieCount = {
-      ...movieCount,
-      [id]: (movieCount[id] ?? 0) + 1,
-    };
-    console.log(session);
+    // const session = request.session;
+    // const movieCount = session.movieCount ?? {};
+    // request.session.movieCount = {
+    //   ...movieCount,
+    //   [id]: (movieCount[id] ?? 0) + 1,
+    // };
+    // console.log(session);
     // number로 변환 및 검증
     return this.movieService.findOne(id);
   }
 
   @Post()
   @RBAC(Role.admin)
-  @UseInterceptors(TransactionInterceptor)
+  // @UseInterceptors(TransactionInterceptor)
   postMovie(
     @Body() body: CreateMovieDto,
-    @QueryRunner() queryRunner: QR,
+    // @QueryRunner() queryRunner: QR,
     @UserId() userId: number,
   ) {
-    return this.movieService.create(body, userId, queryRunner);
+    return this.movieService.create(
+      body,
+      userId,
+      // , queryRunner
+    );
   }
 
   @Patch(':id')

@@ -12,6 +12,7 @@ import { DefaultLogger } from './logger/default.logger';
 import { TasksService } from './tasks.service';
 import { ConfigService } from '@nestjs/config';
 import { envVarableKeys } from './const/env.const';
+import { PrismaService } from './prisma.service';
 
 @Module({
   imports: [
@@ -47,7 +48,7 @@ import { envVarableKeys } from './const/env.const';
     }),
   ],
   controllers: [CommonController],
-  providers: [CommonService, TasksService, DefaultLogger],
-  exports: [CommonService, DefaultLogger],
+  providers: [CommonService, TasksService, DefaultLogger, PrismaService],
+  exports: [CommonService, DefaultLogger, PrismaService],
 })
 export class CommonModule {}

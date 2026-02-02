@@ -7,23 +7,25 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { InjectRepository } from '@nestjs/typeorm';
+// import { InjectRepository } from '@nestjs/typeorm';
+import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { envVarableKeys } from 'src/common/const/env.const';
-import { Role, User } from 'src/user/entity/user.entity';
+import { PrismaService } from 'src/common/prisma.service';
 import { UserService } from 'src/user/user.service';
-import { Repository } from 'typeorm';
+// import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    // @InjectRepository(User)
+    // private readonly userRepository: Repository<User>,
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
+    private readonly prisma: PrismaService,
   ) {}
 
   async blockToken(token: string) {
@@ -119,7 +121,11 @@ export class AuthService {
   }
 
   async authenticate(email: string, password: string) {
-    const user = await this.userRepository.findOne({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      omit: { password: false }, // global omit 설정을 오버라이드하여 password 필드 포함
+    });
+    // const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
       throw new BadRequestException('잘못된 로그인 정보입니다.');
