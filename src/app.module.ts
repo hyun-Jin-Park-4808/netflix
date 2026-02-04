@@ -58,11 +58,15 @@ import { MongooseModule } from '@nestjs/mongoose';
         REDIS_PORT: Joi.number().required(),
         REDIS_USERNAME: Joi.string().required(),
         REDIS_PASSWORD: Joi.string().required(),
+        MONGO_DB_URL: Joi.string().required(),
       }),
     }),
-    MongooseModule.forRoot(
-      'mongodb+srv://test:test@nestjsmongo.sou8a96.mongodb.net/?appName=NestJSMongo',
-    ),
+    MongooseModule.forRootAsync({
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>(envVarableKeys.mongoDbUrl),
+      }),
+      inject: [ConfigService],
+    }),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         url: configService.get<string>(envVarableKeys.dbUrl),

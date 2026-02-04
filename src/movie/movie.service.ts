@@ -194,8 +194,10 @@ export class MovieService {
           ? []
           : await this.movieUserLikeModel
               .find({
-                movie: { $in: movieIds },
-                user: userId,
+                movie: {
+                  $in: movieIds.map((id) => new Types.ObjectId(id.toString())),
+                },
+                user: new Types.ObjectId(userId.toString()),
               })
               .populate('movie') // populate: 연관된 데이터를 가져온다.
               .exec();
@@ -799,7 +801,7 @@ export class MovieService {
     //   .getOne();
   }
 
-  async toggleMovieLike(movieId: string, userId: number, isLike: boolean) {
+  async toggleMovieLike(movieId: string, userId: string, isLike: boolean) {
     const movie = await this.movieModel.findById(movieId).exec();
     // const movie = await this.movieRepository.findOne({
     //   where: { id: movieId },
@@ -827,8 +829,8 @@ export class MovieService {
     }
 
     const likeRecord = await this.movieUserLikeModel.findOne({
-      movie: movieId,
-      user: userId,
+      movie: new Types.ObjectId(movieId),
+      user: new Types.ObjectId(userId),
     });
     // const likeRecord = await this.prisma.movieUserLike.findUnique({
     //   where: {
@@ -873,8 +875,8 @@ export class MovieService {
       }
     } else {
       await this.movieUserLikeModel.create({
-        movie: movie._id, // _id는 mongoose에서 자동으로 생성해주는 id
-        user: user._id,
+        movie: new Types.ObjectId(movieId),
+        user: new Types.ObjectId(userId),
         isLike,
       });
       // await this.prisma.movieUserLike.create({
@@ -901,8 +903,8 @@ export class MovieService {
     }
 
     const result = await this.movieUserLikeModel.findOne({
-      movie: movieId,
-      user: userId,
+      movie: new Types.ObjectId(movieId),
+      user: new Types.ObjectId(userId),
     });
     // const result = await this.prisma.movieUserLike.findUnique({
     //   where: {

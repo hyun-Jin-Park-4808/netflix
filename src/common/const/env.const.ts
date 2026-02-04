@@ -17,6 +17,7 @@ const redisHost = 'REDIS_HOST';
 const redisPort = 'REDIS_PORT';
 const redisUsername = 'REDIS_USERNAME';
 const redisPassword = 'REDIS_PASSWORD';
+const mongoDbUrl = 'MONGO_DB_URL';
 
 export const envVarableKeys = {
   env,
@@ -38,4 +39,5 @@ export const envVarableKeys = {
   redisPort,
   redisUsername,
   redisPassword,
+  mongoDbUrl,
 };
