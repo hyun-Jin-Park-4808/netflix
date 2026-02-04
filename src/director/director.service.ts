@@ -4,7 +4,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDirectorDto } from './dto/create-director.dto';
 import { UpdateDirectorDto } from './dto/update-director.dto';
 // import { Director } from './entity/director.entity';
-import { PrismaService } from 'src/common/prisma.service';
+// import { PrismaService } from 'src/common/prisma.service';
 import { InjectModel } from '@nestjs/mongoose';
 import { Director } from './schema/director.schema';
 import { Model } from 'mongoose';
@@ -29,12 +29,12 @@ export class DirectorService {
     // return this.prisma.director.findMany();
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return this.directorModel.findById(id).exec();
     // return this.prisma.director.findUnique({ where: { id } });
   }
 
-  async update(id: number, updateDirectorDto: UpdateDirectorDto) {
+  async update(id: string, updateDirectorDto: UpdateDirectorDto) {
     const director = await this.directorModel.findById(id).exec();
     // const director = await this.prisma.director.findUnique({
     //   where: { id },
@@ -57,7 +57,7 @@ export class DirectorService {
     return newDirector;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const director = await this.directorModel.findById(id).exec();
     // const director = await this.prisma.director.findUnique({
     //   where: { id },

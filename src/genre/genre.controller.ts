@@ -18,7 +18,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 @Controller('genre')
 @ApiBearerAuth()
 @ApiTags('genre')
-@UseInterceptors(ClassSerializerInterceptor)
+// @UseInterceptors(ClassSerializerInterceptor) // Mongoose Document를 반환할 때 id가 자동으로 변환되지 않아서 해당 데코레이터 사용하면 호환이 안된다.
 export class GenreController {
   constructor(private readonly genreService: GenreService) {}
 
@@ -33,20 +33,17 @@ export class GenreController {
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
+  findOne(@Param('id') id: string) {
     return this.genreService.findOne(id);
   }
 
   @Patch(':id')
-  update(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateGenreDto: UpdateGenreDto,
-  ) {
+  update(@Param('id') id: string, @Body() updateGenreDto: UpdateGenreDto) {
     return this.genreService.update(id, updateGenreDto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
+  remove(@Param('id') id: string) {
     return this.genreService.remove(id);
   }
 }

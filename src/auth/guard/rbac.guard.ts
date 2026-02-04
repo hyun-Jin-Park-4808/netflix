@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Observable } from 'rxjs';
-import { Role } from 'src/user/entity/user.entity';
+import { Role } from '@prisma/client';
 import { RBAC } from '../decorator/rbac.decorator';
 
 @Injectable()
@@ -25,6 +24,12 @@ export class RBACGuard implements CanActivate {
       return false;
     }
 
-    return user.role <= role; // 유저의 권한이 입력한 권한과 같거나 상위 권한이어야 true를 리턴한다.
+    const roleAccessLevel = {
+      [Role.admin]: 0,
+      [Role.paidUser]: 1,
+      [Role.user]: 2,
+    };
+
+    return roleAccessLevel[user.role] >= roleAccessLevel[role]; // 유저의 권한이 입력한 권한과 같거나 상위 권한이어야 true를 리턴한다.
   }
 }

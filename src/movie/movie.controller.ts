@@ -44,7 +44,7 @@ import { Role } from '@prisma/client';
 })
 @ApiBearerAuth()
 @ApiTags('movie')
-@UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
+// @UseInterceptors(ClassSerializerInterceptor) // class transformer를 movie controller에 적용하겠다.
 export class MovieController {
   constructor(private readonly movieService: MovieService) {}
   // 사용하고 싶은 의존성을 정의만 해주면 nestJS에서 알아서 의존성 주입을 해준다.
@@ -87,7 +87,7 @@ export class MovieController {
       //   },
       // }),
     )
-    id: number,
+    id: string,
     // @Req() request: any,
   ) {
     // const session = request.session;
@@ -118,16 +118,13 @@ export class MovieController {
 
   @Patch(':id')
   @RBAC(Role.admin)
-  patchMovie(
-    @Param('id', ParseIntPipe) id: number, // 기본 파이프 적용
-    @Body() body: UpdateMovieDto,
-  ) {
+  patchMovie(@Param('id') id: string, @Body() body: UpdateMovieDto) {
     return this.movieService.update(id, body);
   }
 
   @Delete(':id')
   @RBAC(Role.admin)
-  deleteMovie(@Param('id', ParseIntPipe) id: number) {
+  deleteMovie(@Param('id') id: string) {
     return this.movieService.remove(id);
   }
 
@@ -147,18 +144,12 @@ export class MovieController {
    * Dislike버튼 누름 -> Like 버튼 불 꺼지고 Dislike 버튼 불 켜짐
    */
   @Post(':id/like')
-  createMovieLike(
-    @Param('id', ParseIntPipe) id: number,
-    @UserId() userId: number,
-  ) {
+  createMovieLike(@Param('id') id: string, @UserId() userId: number) {
     return this.movieService.toggleMovieLike(id, userId, true);
   }
 
   @Post(':id/dislike')
-  createMovieDislike(
-    @Param('id', ParseIntPipe) id: number,
-    @UserId() userId: number,
-  ) {
+  createMovieDislike(@Param('id') id: string, @UserId() userId: number) {
     return this.movieService.toggleMovieLike(id, userId, false);
   }
 }

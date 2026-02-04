@@ -41,7 +41,7 @@ export class GenreService {
     // return this.prisma.genre.findMany();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const genre = await this.genreModel.findById(id).exec();
     // const genre = await this.prisma.genre.findUnique({
     //   where: { id },
@@ -53,7 +53,7 @@ export class GenreService {
     return genre;
   }
 
-  async update(id: number, updateGenreDto: UpdateGenreDto) {
+  async update(id: string, updateGenreDto: UpdateGenreDto) {
     const genre = await this.genreModel.findById(id).exec();
     // const genre = await this.prisma.genre.findUnique({
     //   where: { id },
@@ -72,7 +72,7 @@ export class GenreService {
     return newGenre;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const genre = await this.genreModel.findById(id).exec();
     // const genre = await this.prisma.genre.findUnique({
     //   where: { id },

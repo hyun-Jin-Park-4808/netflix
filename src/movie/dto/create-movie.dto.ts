@@ -26,22 +26,22 @@ export class CreateMovieDto {
   detail: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @IsString()
   @ApiProperty({
     description: '감독 객체 ID',
-    example: 1,
+    example: '68e24556702078604454735f',
   })
-  directorId: number;
+  directorId: string;
 
   @IsArray()
   @ArrayNotEmpty()
-  @Type(() => Number)
-  @IsNumber({}, { each: true }) // each: true :  validation 옵션, 배열 모든 요소가 number 타입이어야 한다.
+  @Type(() => String)
+  @IsString({ each: true }) // each: true :  validation 옵션, 배열 모든 요소가 number 타입이어야 한다.
   @ApiProperty({
     description: '작품 장르 IDs',
-    example: [1, 2, 3],
+    example: ['1', '2', '3'],
   })
-  genreIds: number[];
+  genreIds: string[];
 
   @IsNotEmpty()
   @IsString()

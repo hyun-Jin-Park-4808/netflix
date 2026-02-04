@@ -7,11 +7,14 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { InjectModel } from '@nestjs/mongoose';
 // import { InjectRepository } from '@nestjs/typeorm';
 import { Role } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { Model, Types } from 'mongoose';
 import { envVarableKeys } from 'src/common/const/env.const';
-import { PrismaService } from 'src/common/prisma.service';
+import { User } from 'src/user/schema/user.schema';
+// import { PrismaService } from 'src/common/prisma.service';
 import { UserService } from 'src/user/user.service';
 // import { Repository } from 'typeorm';
 
@@ -25,7 +28,9 @@ export class AuthService {
     private readonly jwtService: JwtService,
     @Inject(CACHE_MANAGER)
     private readonly cacheManager: Cache,
-    private readonly prisma: PrismaService,
+    // private readonly prisma: PrismaService,
+    @InjectModel(User.name)
+    private readonly userModel: Model<User>,
   ) {}
 
   async blockToken(token: string) {
@@ -121,10 +126,13 @@ export class AuthService {
   }
 
   async authenticate(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-      omit: { password: false }, // global omit 설정을 오버라이드하여 password 필드 포함
-    });
+    const user = await this.userModel
+      .findOne({ email }, { password: 1, role: 1 })
+      .exec();
+    // const user = await this.prisma.user.findUnique({
+    //   where: { email },
+    //   omit: { password: false }, // global omit 설정을 오버라이드하여 password 필드 포함
+    // });
     // const user = await this.userRepository.findOne({ where: { email } });
 
     if (!user) {
@@ -140,7 +148,7 @@ export class AuthService {
     return user;
   }
 
-  async issueToken(user: { id: number; role: Role }, isRefreshToken: boolean) {
+  async issueToken(user: { _id: any; role: Role }, isRefreshToken: boolean) {
     const refreshTokenSecret = this.configService.get<string>(
       envVarableKeys.refreshTokenSecret,
     );
@@ -150,7 +158,7 @@ export class AuthService {
 
     return await this.jwtService.signAsync(
       {
-        sub: user.id,
+        sub: user._id,
         role: user.role,
         type: isRefreshToken ? 'refresh' : 'access',
       },

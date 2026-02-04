@@ -3,6 +3,7 @@ import {
   BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -69,7 +70,14 @@ export class MovieService {
       return cacheData;
     }
 
-    const data = await this.movieModel.find().sort({ createdAt: -1 }).limit(10); // createdAt: -1은 내림차순 정렬
+    const data = await this.movieModel
+      .find()
+      .populate({
+        path: 'genres',
+        model: 'Genre',
+      })
+      .sort({ createdAt: -1 })
+      .limit(10); // createdAt: -1은 내림차순 정렬
     // const data = await this.prisma.movie.findMany({
     //   orderBy: {
     //     createdAt: 'desc',
@@ -113,13 +121,17 @@ export class MovieService {
     // orderBy를 하나의 객체로 생성
     const orderBy = order.reduce((acc, field) => {
       const [column, direction] = field.split('_');
-      acc[column] = direction.toLocaleLowerCase();
+      if (column === 'id') {
+        acc['_id'] = direction.toLowerCase();
+      } else {
+        acc[column] = direction.toLowerCase();
+      }
       return acc;
     }, {});
 
     // const orderBy = order.map((field) => {
     //   const [column, direction] = field.split('_');
-    //   return { [column]: direction.toLocaleLowerCase() };
+    //   return { [column]: direction.toLowerCase() };
     // });
 
     const query = this.movieModel
@@ -130,8 +142,7 @@ export class MovieService {
       .limit(take + 1);
 
     if (cursor) {
-      // cursor id보다 큰 값들을 가져온다.
-      query.skip(1).gt('_id', new Types.ObjectId(cursor));
+      query.lt('_id', new Types.ObjectId(cursor)); // lt: less than
     }
 
     const movies = await query.populate('genres director').exec();
@@ -228,7 +239,7 @@ export class MovieService {
 
       return {
         data: movies.map((movie) => ({
-          ...movie,
+          ...movie.toObject(),
           likeStatus:
             movie._id.toString() in likedMovieMap
               ? likedMovieMap[movie._id.toString()]
@@ -273,7 +284,7 @@ export class MovieService {
     //   .getOne();
   }
 
-  async findOne(id: number) {
+  async findOne(id: string) {
     const movie = await this.movieModel.findById(id).exec();
     // const movie = await this.prisma.movie.findUnique({
     //   where: {
@@ -305,7 +316,7 @@ export class MovieService {
     qr: QueryRunner,
     createMovieDto: CreateMovieDto,
     director: Director,
-    movieDetailId: number,
+    movieDetailId: string,
     userId: number,
     movieFolder: string,
   ) {
@@ -327,7 +338,7 @@ export class MovieService {
   /* istanbul ignore next */
   async createMovieGenreRelation(
     qr: QueryRunner,
-    movieId: number,
+    movieId: string,
     genres: Genre[],
   ) {
     // return qr.manager
@@ -437,7 +448,12 @@ export class MovieService {
 
       return await this.movieModel
         .findById(movie[0]._id)
-        .populate('detail director genres')
+        .populate('detail')
+        .populate('director')
+        .populate({
+          path: 'genres',
+          model: 'Genre',
+        })
         .exec();
       // return await prisma.movie.findUnique({
       //   where: { id: movie.id },
@@ -445,6 +461,8 @@ export class MovieService {
       // });
     } catch (e) {
       await session.abortTransaction();
+      console.log(e);
+      throw new InternalServerErrorException('transaction failed.');
     } finally {
       await session.endSession();
     }
@@ -541,7 +559,7 @@ export class MovieService {
     //   );
   }
 
-  async update(id: number, updateMovieDto: UpdateMovieDto) {
+  async update(id: string, updateMovieDto: UpdateMovieDto) {
     // return this.prisma.$transaction(async (prisma) => {
 
     const session = await this.movieModel.startSession();
@@ -731,7 +749,7 @@ export class MovieService {
     //   .execute();
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const movie = await this.movieModel.findById(id).populate('detail').exec();
     // const movie = await this.prisma.movie.findUnique({
     //   where: {
@@ -781,7 +799,7 @@ export class MovieService {
     //   .getOne();
   }
 
-  async toggleMovieLike(movieId: number, userId: number, isLike: boolean) {
+  async toggleMovieLike(movieId: string, userId: number, isLike: boolean) {
     const movie = await this.movieModel.findById(movieId).exec();
     // const movie = await this.movieRepository.findOne({
     //   where: { id: movieId },

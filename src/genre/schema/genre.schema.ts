@@ -8,6 +8,7 @@ import { Movie } from 'src/movie/schema/movie.schema';
 export class Genre extends Document {
   @Prop({
     required: true,
+    unique: true,
   })
   name: string;
 

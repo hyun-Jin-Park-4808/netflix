@@ -51,7 +51,17 @@ export class UserService {
     // await this.prisma.user.create({ data: { email, password: hash } });
     // await this.userRepository.save({ email, password: hash });
 
-    return this.userModel.findOne({ email }).exec();
+    return this.userModel
+      .findOne(
+        { email },
+        {
+          createdMovies: 0,
+          likedMovies: 0,
+          chats: 0,
+          chatRooms: 0,
+        },
+      )
+      .exec();
     // return this.prisma.user.findUnique({ where: { email } });
     // return this.userRepository.findOne({ where: { email } });
   }
