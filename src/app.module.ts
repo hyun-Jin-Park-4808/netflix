@@ -30,6 +30,7 @@ import { MovieModule } from './movie/movie.module';
 import { User } from './user/entity/user.entity';
 import { UserModule } from './user/user.module';
 import { WorkerModule } from './worker/worker.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
@@ -59,6 +60,9 @@ import { WorkerModule } from './worker/worker.module';
         REDIS_PASSWORD: Joi.string().required(),
       }),
     }),
+    MongooseModule.forRoot(
+      'mongodb+srv://test:test@nestjsmongo.sou8a96.mongodb.net/?appName=NestJSMongo',
+    ),
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         url: configService.get<string>(envVarableKeys.dbUrl),

@@ -1,23 +1,41 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+// import { TypeOrmModule } from '@nestjs/typeorm';
 import { CommonModule } from 'src/common/common.module';
-import { Director } from 'src/director/entity/director.entity';
-import { Genre } from 'src/genre/entity/genre.entity';
-import { User } from 'src/user/entity/user.entity';
-import { MovieDetail } from './entity/movie-detail.entity';
-import { MovieUserLike } from './entity/movie-user-like.entity';
-import { Movie } from './entity/movie.entity';
+// import { Director } from 'src/director/entity/director.entity';
+// import { Genre } from 'src/genre/entity/genre.entity';
+// import { User } from 'src/user/entity/user.entity';
+// import { MovieDetail } from './entity/movie-detail.entity';
+// import { MovieUserLike } from './entity/movie-user-like.entity';
+// import { Movie } from './entity/movie.entity';
 import { MovieController } from './movie.controller';
 import { MovieService } from './movie.service';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Movie, MovieSchema } from './schema/movie.schema';
+import { MovieDetail, MovieDetailSchema } from './schema/movie-detail.schema';
+import { Director, DirectorSchema } from 'src/director/schema/director.schema';
+import { Genre, GenreSchema } from 'src/genre/schema/genre.schema';
+import {
+  MovieUserLike,
+  MovieUserLikeSchema,
+} from './schema/movie-user-like.schema';
+import { User, UserSchema } from 'src/user/schema/user.schema';
 @Module({
   imports: [
-    TypeOrmModule.forFeature([
-      Movie,
-      MovieDetail,
-      Director,
-      Genre,
-      MovieUserLike,
-      User,
+    // TypeOrmModule.forFeature([
+    //   Movie,
+    //   MovieDetail,
+    //   Director,
+    //   Genre,
+    //   MovieUserLike,
+    //   User,
+    // ]),
+    MongooseModule.forFeature([
+      { name: Movie.name, schema: MovieSchema },
+      { name: MovieDetail.name, schema: MovieDetailSchema },
+      { name: Director.name, schema: DirectorSchema },
+      { name: Genre.name, schema: GenreSchema },
+      { name: MovieUserLike.name, schema: MovieUserLikeSchema },
+      { name: User.name, schema: UserSchema },
     ]),
     CommonModule,
     // MulterModule.register({
